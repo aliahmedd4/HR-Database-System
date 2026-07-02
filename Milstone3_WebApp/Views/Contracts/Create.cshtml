@@ -1,0 +1,85 @@
+﻿@model Milstone3_WebApp.Contract
+
+@{
+    ViewData["Title"] = "Create New Contract";
+}
+
+<h1>Create New Contract</h1>
+<h4>Employment Contract</h4>
+<hr />
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="EmployeeId" class="control-label fw-bold">Employee <span class="text-danger">*</span></label>
+                <select asp-for="EmployeeId" class="form-select" asp-items="ViewBag.EmployeeId">
+                    <option value="">-- Select Employee --</option>
+                </select>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ContractType" class="control-label fw-bold">Contract Type <span class="text-danger">*</span></label>
+                <select asp-for="ContractType" class="form-select" asp-items="ViewBag.ContractTypes">
+                    <option value="">-- Select Contract Type --</option>
+                </select>
+                <span asp-validation-for="ContractType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="StartDate" class="control-label fw-bold">Start Date <span class="text-danger">*</span></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="EndDate" class="control-label fw-bold">End Date</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+                <small class="form-text text-muted">Leave empty for indefinite contracts</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Type" class="control-label fw-bold">Type (Optional)</label>
+                <input asp-for="Type" class="form-control" placeholder="e.g., Permanent, Temporary" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <input type="submit" value="Create Contract" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Contract Creation Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">✓ Select an active employee from the dropdown</li>
+                    <li class="mb-2">✓ Choose the appropriate contract type</li>
+                    <li class="mb-2">✓ Set the start date (required)</li>
+                    <li class="mb-2">✓ Set end date for fixed-term contracts, or leave empty for indefinite</li>
+                    <li class="mb-2">✓ The employee will receive a notification about the new contract</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

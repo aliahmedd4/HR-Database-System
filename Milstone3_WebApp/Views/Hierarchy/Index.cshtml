@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Milstone3_WebApp.Employee>
+
+@{
+    ViewData["Title"] = "Organizational Hierarchy";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>Organizational Hierarchy</h2>
+    <p>Browse employees by department and reporting structure</p>
+</div>
+
+<!-- Search + Filter -->
+<div class="mb-3 d-flex justify-content-between">
+    <form asp-action="Index" method="get" class="d-flex">
+        <input type="text" name="search" class="form-control me-2" placeholder="Search employees..." />
+        <select name="department" class="form-select me-2">
+            <option value="">All Departments</option>
+            @if (ViewBag.Departments != null)
+            {
+                foreach (var dept in ViewBag.Departments)
+                {
+                    <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                }
+            }
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+</div>
+
+<!-- Employee Table -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Position</th>
+            <th>Department</th>
+            <th>Manager</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var emp in Model)
+        {
+            <tr>
+                <td>@emp.FullName</td>
+                <td>@emp.Position</td>
+                <td>@emp.Department?.DepartmentName</td>
+                <td>@emp.Manager?.FullName</td>
+                <td>
+                    <a asp-action="Reassign" asp-route-id="@emp.EmployeeId" class="btn btn-sm btn-warning">Reassign</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

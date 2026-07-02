@@ -1,0 +1,73 @@
+@model IEnumerable<Milstone3_WebApp.ShiftAssignment>
+@{
+    ViewData["Title"] = "Shift Assignments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Shift Assignments</h2>
+    <div>
+        @if (User.IsInRole("SystemAdmin") || User.IsInRole("LineManager"))
+        {
+            <a asp-action="AssignToEmployee" class="btn btn-primary">Assign to Employee</a>
+            <a asp-action="AssignToDepartment" class="btn btn-outline-primary">Assign to Department</a>
+        }
+        @if (User.IsInRole("SystemAdmin"))
+        {
+            <a asp-action="AssignCustomShift" class="btn btn-outline-secondary">Custom Shift</a>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Shift</th>
+                <th>Assignment Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(item.Employee?.FullName ?? "N/A")</td>
+                    <td>@(item.Department?.DepartmentName ?? "N/A")</td>
+                    <td>@item.Shift.Name</td>
+                    <td>
+                        <span class="badge bg-info">@item.AssignmentType</span>
+                    </td>
+                    <td>@item.StartDate.ToString("MMM dd, yyyy")</td>
+                    <td>@(item.EndDate?.ToString("MMM dd, yyyy") ?? "Ongoing")</td>
+                    <td>
+                        <span class="badge bg-@(item.IsActive == true ? "success" : "secondary")">
+                            @(item.IsActive == true ? "Active" : "Inactive")
+                        </span>
+                    </td>
+                    <td>
+                        @if (User.IsInRole("SystemAdmin"))
+                        {
+                            <a asp-action="EditAssignment" asp-route-id="@item.AssignmentId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No shift assignments found.</div>
+}
+

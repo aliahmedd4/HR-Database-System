@@ -1,0 +1,49 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.userprefs
+
+## Build outputs
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww]in32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+## Publish
+[Pp]ublic/
+publish/
+**/publish/
+*PublishProfiles/
+
+## Secrets / sensitive configs
+appsettings.Production.json
+secrets.json
+*.pfx
+*.key
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Milstone3_WebApp.Payroll>
+
+@{
+    ViewData["Title"] = "Payrolls";
+}
+
+<div class="welcome-banner">
+    <h2>Payrolls</h2>
+    <p>Browse all payroll records in the HRMS system. Use the button below to add new ones.</p>
+    <a asp-action="Create" class="btn btn-primary">➕ Create New Payroll</a>
+</div>
+
+<div class="card-grid">
+    @foreach (var payroll in Model)
+    {
+        <div class="card">
+            <h3>Payroll ID: @payroll.PeriodId</h3>
+            <p><strong>Employee:</strong> @payroll.Employee?.EmployeeId</p>
+            <p>💰 Net Salary: @payroll.NetSalary</p>
+            <p>💵 Gross Salary: @payroll.GrossSalary</p>
+            <p>📊 Base Amount: @payroll.BaseAmount</p>
+            <p>📈 Actual Pay: @payroll.ActualPay</p>
+            <p>📅 Period: @payroll.PeriodStart?.ToShortDateString() - @payroll.PeriodEnd?.ToShortDateString()</p>
+            <p>⚖️ Taxes: @payroll.Taxes</p>
+            <p>➕ Allowances: @payroll.TotalAllowances</p>
+            <p>➖ Deductions: @payroll.TotalDeductions</p>
+            <p>⏳ Payment Date: @payroll.PaymentDate?.ToShortDateString()</p>
+            <p>⏱ Hours Worked: @payroll.HoursWorked | Overtime: @payroll.OvertimeHours</p>
+            <p>📌 Status: @payroll.Status</p>
+            <p>🕒 Created At: @payroll.CreatedAt</p>
+            <p>💱 Currency: @payroll.Currency?.CurrencyId</p>
+
+            <div class="form-actions">
+                <a asp-action="Details" asp-route-id="@payroll.PayrollId" class="btn btn-secondary">View</a>
+                <a asp-action="Edit" asp-route-id="@payroll.PayrollId" class="btn btn-primary">Edit</a>
+                <a asp-action="Delete" asp-route-id="@payroll.PayrollId" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    }
+</div>

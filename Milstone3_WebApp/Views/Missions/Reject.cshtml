@@ -1,0 +1,71 @@
+@model Milstone3_WebApp.Mission
+@{
+    ViewData["Title"] = "Reject Mission";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>Reject Mission</h2>
+    <p>Review the mission details and provide a reason for rejection</p>
+</div>
+
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Mission Details</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-4">Mission Name:</dt>
+            <dd class="col-sm-8">@Model.MissionName</dd>
+
+            <dt class="col-sm-4">Employee:</dt>
+            <dd class="col-sm-8">@(Model.Employee?.FullName ?? "N/A")</dd>
+
+            <dt class="col-sm-4">Destination:</dt>
+            <dd class="col-sm-8">@Model.Destination</dd>
+
+            <dt class="col-sm-4">Location:</dt>
+            <dd class="col-sm-8">@Model.Location</dd>
+
+            <dt class="col-sm-4">Start Date:</dt>
+            <dd class="col-sm-8">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
+
+            <dt class="col-sm-4">End Date:</dt>
+            <dd class="col-sm-8">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "Not set")</dd>
+
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8"><span class="badge bg-warning">@Model.Status</span></dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <form asp-action="Reject" method="post">
+            <input type="hidden" asp-for="MissionId" />
+            
+            <div class="form-group mb-3">
+                <label for="rejectionReason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                <textarea name="rejectionReason" id="rejectionReason" class="form-control" rows="4" required placeholder="Please provide a reason for rejecting this mission..."></textarea>
+                <span class="text-danger field-validation-valid" data-valmsg-for="rejectionReason" data-valmsg-replace="true"></span>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>Note:</strong> The employee will be notified of this rejection with the reason you provide.
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    ✗ Reject Mission
+                </button>
+                <a asp-action="PendingApprovals" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

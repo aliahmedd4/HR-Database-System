@@ -1,0 +1,101 @@
+@model Milstone3_WebApp.Leave
+
+@{
+    ViewData["Title"] = "Edit Leave Type";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>Edit Leave Type</h2>
+    <p>Update leave type configuration.</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm p-4">
+    <form asp-action="EditLeaveType" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="LeaveId" />
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="LeaveType" class="form-label"><strong>Leave Type <span class="text-danger">*</span></strong></label>
+                <input asp-for="LeaveType" class="form-control" required />
+                <span asp-validation-for="LeaveType" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="LeaveDescription" class="form-label"><strong>Description <span class="text-danger">*</span></strong></label>
+                <input asp-for="LeaveDescription" class="form-control" required />
+                <span asp-validation-for="LeaveDescription" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Additional Notes</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="MaxDaysPerYear" class="form-label"><strong>Max Days Per Year <span class="text-danger">*</span></strong></label>
+                <input asp-for="MaxDaysPerYear" class="form-control" type="number" min="0" required />
+                <span asp-validation-for="MaxDaysPerYear" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="form-check mt-4">
+                    <input name="IsPaid" id="IsPaid" class="form-check-input" type="checkbox" value="true" checked="@(Model.IsPaid == true)" />
+                    <input type="hidden" name="IsPaid" value="false" />
+                    <label for="IsPaid" class="form-check-label">
+                        Paid Leave
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="form-check mt-4">
+                    <input name="RequiresApproval" id="RequiresApproval" class="form-check-input" type="checkbox" value="true" checked="@(Model.RequiresApproval == true)" />
+                    <input type="hidden" name="RequiresApproval" value="false" />
+                    <label for="RequiresApproval" class="form-check-label">
+                        Requires Approval
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input name="IsActive" id="IsActive" class="form-check-input" type="checkbox" value="true" checked="@(Model.IsActive == true)" />
+                <input type="hidden" name="IsActive" value="false" />
+                <label for="IsActive" class="form-check-label">
+                    Active
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Save Changes
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+

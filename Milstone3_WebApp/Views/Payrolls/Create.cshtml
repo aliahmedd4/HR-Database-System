@@ -1,0 +1,111 @@
+﻿@model Milstone3_WebApp.Payroll
+
+@{
+    ViewData["Title"] = "Create Payroll";
+}
+
+<div class="welcome-banner">
+    <h2>Create Payroll</h2>
+    <p>Fill out the payroll details below to generate a new payroll record.</p>
+</div>
+
+<div class="card">
+    <form asp-action="Create" class="form-grid">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!-- Employee -->
+        <div class="form-group">
+            <label asp-for="EmployeeId"></label>
+            <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
+        </div>
+
+        <!-- Taxes -->
+        <div class="form-group">
+            <label asp-for="Taxes"></label>
+            <input asp-for="Taxes" class="form-control" />
+            <span asp-validation-for="Taxes" class="text-danger"></span>
+        </div>
+
+        <!-- Period -->
+        <div class="form-group">
+            <label asp-for="PeriodStart"></label>
+            <input asp-for="PeriodStart" type="date" class="form-control" />
+            <span asp-validation-for="PeriodStart" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PeriodEnd"></label>
+            <input asp-for="PeriodEnd" type="date" class="form-control" />
+            <span asp-validation-for="PeriodEnd" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PeriodId"></label>
+            <input asp-for="PeriodId" class="form-control" />
+            <span asp-validation-for="PeriodId" class="text-danger"></span>
+        </div>
+
+        <!-- Adjustments & Contributions -->
+        <div class="form-group">
+            <label asp-for="Adjustments"></label>
+            <input asp-for="Adjustments" class="form-control" />
+            <span asp-validation-for="Adjustments" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Contributions"></label>
+            <input asp-for="Contributions" class="form-control" />
+            <span asp-validation-for="Contributions" class="text-danger"></span>
+        </div>
+
+        <!-- Salary -->
+        <div class="form-group">
+            <label asp-for="ActualPay"></label>
+            <input asp-for="ActualPay" class="form-control" />
+            <span asp-validation-for="ActualPay" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NetSalary"></label>
+            <input asp-for="NetSalary" class="form-control" />
+            <span asp-validation-for="NetSalary" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="BaseAmount"></label>
+            <input asp-for="BaseAmount" class="form-control" />
+            <span asp-validation-for="BaseAmount" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GrossSalary"></label>
+            <input asp-for="GrossSalary" class="form-control" />
+            <span asp-validation-for="GrossSalary" class="text-danger"></span>
+        </div>
+
+        <!-- Payment -->
+        <div class="form-group">
+            <label asp-for="PaymentDate"></label>
+            <input asp-for="PaymentDate" type="date" class="form-control" />
+            <span asp-validation-for="PaymentDate" class="text-danger"></span>
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group">
+            <label asp-for="CurrencyId"></label>
+            <select asp-for="CurrencyId" class="form-control" asp-items="ViewBag.CurrencyId"></select>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Create Payroll</button>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

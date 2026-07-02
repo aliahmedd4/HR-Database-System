@@ -1,0 +1,162 @@
+Changed database context to 'HR_Payroll_System'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ViewEmployeeInfo, Line 2
+Invalid object name 'ViewEmployeeInfo'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AddEmployee, Line 5
+Invalid object name 'AddEmployee'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateEmployeeInfo, Line 3
+Invalid object name 'UpdateEmployeeInfo'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignRole, Line 8
+Invalid object name 'AssignRole'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetDepartmentEmployeeStats, Line 5
+Invalid object name 'GetDepartmentEmployeeStats'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ReassignManager, Line 4
+Invalid object name 'ReassignManager'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ReassignHierarchy, Line 4
+Invalid object name 'ReassignHierarchy'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure NotifyStructureChange, Line 7
+Invalid object name 'NotifyStructureChange'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ViewOrgHierarchy, Line 5
+Invalid object name 'ViewOrgHierarchy'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignShiftToEmployee, Line 4
+Invalid object name 'AssignShiftToEmployee'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateShiftStatus, Line 3
+Invalid object name 'UpdateShiftStatus'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignShiftToDepartment, Line 3
+Invalid object name 'AssignShiftToDepartment'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignCustomShift, Line 4
+Invalid object name 'AssignCustomShift'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ConfigureSplitShift, Line 5
+Invalid object name 'ConfigureSplitShift'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure EnableFirstInLastOut, Line 5
+Invalid object name 'EnableFirstInLastOut'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure TagAttendanceSource, Line 4
+Invalid object name 'TagAttendanceSource'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SyncOfflineAttendance, Line 3
+Invalid object name 'SyncOfflineAttendance'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure LogAttendanceEdit, Line 2
+Invalid object name 'LogAttendanceEdit'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ApplyHolidayOverrides, Line 5
+Invalid object name 'ApplyHolidayOverrides'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ManageUserAccounts, Line 3
+Invalid object name 'ManageUserAccounts'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure CreateContract, Line 4
+Invalid object name 'CreateContract'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure RenewContract, Line 2
+Invalid object name 'RenewContract'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ApproveLeaveRequest, Line 4
+Invalid object name 'ApproveLeaveRequest'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignMission, Line 3
+Invalid object name 'AssignMission'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ReviewReimbursement, Line 3
+Invalid object name 'ReviewReimbursement'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetActiveContracts, Line 4
+Invalid object name 'GetActiveContracts'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetTeamByManager, Line 3
+Invalid object name 'GetTeamByManager'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateLeavePolicy, Line 3
+Invalid object name 'UpdateLeavePolicy'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetExpiringContracts, Line 2
+Invalid object name 'GetExpiringContracts'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignDepartmentHead, Line 3
+Invalid object name 'AssignDepartmentHead'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure CreateEmployeeProfile, Line 3
+Invalid object name 'CreateEmployeeProfile'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateEmployeeProfile, Line 3
+Invalid object name 'UpdateEmployeeProfile'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SetProfileCompleteness, Line 4
+Invalid object name 'SetProfileCompleteness'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GenerateProfileReport, Line 4
+Invalid object name 'GenerateProfileReport'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure CreateShiftType, Line 6
+Invalid object name 'CreateShiftType'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignRotationalShift, Line 7
+Invalid object name 'AssignRotationalShift'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure NotifyShiftExpiry, Line 4
+Invalid object name 'NotifyShiftExpiry'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure DefineShortTimeRules, Line 3
+Invalid object name 'DefineShortTimeRules'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SetGracePeriod, Line 5
+Invalid object name 'SetGracePeriod'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure DefinePenaltyThreshold, Line 4
+Invalid object name 'DefinePenaltyThreshold'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure EscalatePendingRequests, Line 4
+Invalid object name 'EscalatePendingRequests'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure LinkVacationToShift, Line 4
+Invalid object name 'LinkVacationToShift'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateLeaveEntitlements, Line 4
+Invalid object name 'UpdateLeaveEntitlements'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ConfigureLeaveEligibility, Line 3
+Invalid object name 'ConfigureLeaveEligibility'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AssignLeaveEntitlement, Line 4
+Invalid object name 'AssignLeaveEntitlement'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ConfigureSpecialLeave, Line 6
+Invalid object name 'ConfigureSpecialLeave'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SetLeaveYearRules, Line 7
+Invalid object name 'SetLeaveYearRules'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AdjustLeaveBalance, Line 4
+Invalid object name 'AdjustLeaveBalance'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ManageLeaveRoles, Line 4
+Invalid object name 'ManageLeaveRoles'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure FinalizeLeaveRequest, Line 2
+Invalid object name 'FinalizeLeaveRequest'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure OverrideLeaveDecision, Line 3
+Invalid object name 'OverrideLeaveDecision'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure BulkProcessLeaveRequests, Line 4
+Invalid object name 'BulkProcessLeaveRequests'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure VerifyMedicalLeave, Line 4
+Invalid object name 'VerifyMedicalLeave'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SyncLeaveBalances, Line 6
+Invalid object name 'SyncLeaveBalances'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure OverrideLeaveDecision, Line 4
+Invalid object name 'OverrideLeaveDecision'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SyncLeaveToattendance, Line 6
+Invalid object name 'SyncLeaveToattendance'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateInsuranceBrackets, Line 5
+Invalid object name 'UpdateInsuranceBrackets'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ApprovePolicyUpdate, Line 4
+Invalid object name 'ApprovePolicyUpdate'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GeneratePayroll, Line 3
+Invalid object name 'GeneratePayroll'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AdjustPayrollItem, Line 5
+Invalid object name 'AdjustPayrollItem'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure CalculateNetSalary, Line 3
+Invalid object name 'CalculateNetSalary'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ApplyPayrollPolicy, Line 2
+Invalid object name 'ApplyPayrollPolicy'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetMonthlyPayrollSummary, Line 6
+Invalid object name 'GetMonthlyPayrollSummary'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetEmployeePayrollHistory, Line 7
+Invalid object name 'GetEmployeePayrollHistory'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure GetBonusEligibleEmployees, Line 2
+Invalid object name 'GetBonusEligibleEmployees'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure UpdateSalaryType, Line 6
+Invalid object name 'UpdateSalaryType'.
+The module 'ViewEmployeeProfile' depends on the missing object 'ViewEmployeeInfo'. The module will still be created; however, it cannot run successfully until the object exists.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure RequestHRDocument, Line 1
+Invalid object name 'RequestHRDocument'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure NotifyProfileUpdate, Line 3
+Invalid object name 'NotifyProfileUpdate'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure LogFlexibleAttendance, Line 2
+Invalid object name 'LogFlexibleAttendance'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure NotifyMissedPunch, Line 2
+Invalid object name 'NotifyMissedPunch'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure RecordMultiplePunches, Line 2
+Invalid object name 'RecordMultiplePunches'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SubmitCorrectionRequest, Line 1
+Invalid object name 'SubmitCorrectionRequest'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ViewRequestStatus, Line 3
+Invalid object name 'ViewRequestStatus'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure AttachLeaveDocuments, Line 3
+Invalid object name 'AttachLeaveDocuments'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ModifyLeaveRequest, Line 1
+Invalid object name 'ModifyLeaveRequest'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure CancelLeaveRequest, Line 3
+Invalid object name 'CancelLeaveRequest'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ViewLeaveBalance, Line 3
+Invalid object name 'ViewLeaveBalance'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure ViewLeaveHistory, Line 2
+Invalid object name 'ViewLeaveHistory'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure SubmitLeaveAfterAbsence, Line 2
+Invalid object name 'SubmitLeaveAfterAbsence'.
+Msg 208, Level 16, State 6, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Procedure NotifyLeaveStatusChange, Line 3
+Invalid object name 'NotifyLeaveStatusChange'.

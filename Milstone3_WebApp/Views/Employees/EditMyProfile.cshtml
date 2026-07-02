@@ -1,0 +1,111 @@
+@model Milstone3_WebApp.Employee
+
+@{
+    ViewData["Title"] = "Edit My Profile";
+}
+
+<h1>Edit My Profile</h1>
+<p class="text-muted">You can update your personal details and emergency contact information.</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="EditMyProfile">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="EmployeeId" />
+            <input type="hidden" asp-for="EmployeeCode" />
+            <input type="hidden" asp-for="FirstName" />
+            <input type="hidden" asp-for="LastName" />
+            <input type="hidden" asp-for="FullName" />
+            <input type="hidden" asp-for="Email" />
+
+            <h4 class="mb-3">Personal Details</h4>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Phone" class="form-label">Phone Number</label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Address" class="form-label">Address</label>
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+            </div>
+
+            <h4 class="mb-3 mt-4">Emergency Contact Information</h4>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="EmergencyContactName" class="form-label">Emergency Contact Name</label>
+                    <input asp-for="EmergencyContactName" class="form-control" />
+                    <span asp-validation-for="EmergencyContactName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="EmergencyContactPhone" class="form-label">Emergency Contact Phone</label>
+                    <input asp-for="EmergencyContactPhone" class="form-control" />
+                    <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Relationship" class="form-label">Relationship</label>
+                    <input asp-for="Relationship" class="form-control" placeholder="e.g., Spouse, Parent, Sibling" />
+                    <span asp-validation-for="Relationship" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Note:</strong> You can only update your personal contact information and emergency contacts. 
+                For changes to other information (position, department, salary, etc.), please contact HR.
+            </div>
+
+            <div class="form-group mt-4">
+                <input type="submit" value="Save Changes" class="btn btn-primary" />
+                <a asp-action="Details" asp-route-id="@Model.EmployeeId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Your Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> @Model.FullName</p>
+                <p><strong>Email:</strong> @Model.Email</p>
+                <p><strong>Employee Code:</strong> @Model.EmployeeCode</p>
+                @if (Model.Department != null)
+                {
+                    <p><strong>Department:</strong> @Model.Department.DepartmentName</p>
+                }
+                @if (Model.Position != null)
+                {
+                    <p><strong>Position:</strong> @Model.Position.PositionTitle</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

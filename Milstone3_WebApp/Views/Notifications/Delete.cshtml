@@ -1,0 +1,33 @@
+﻿@model Milstone3_WebApp.Notification
+
+<div class="welcome-banner">
+    <h2>Delete Notification</h2>
+    <p class="text-danger">Are you sure you want to delete this notification?</p>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <p><strong>Title:</strong> @Model.Title</p>
+        <p><strong>Message:</strong> @Model.MessageContent</p>
+        <p><strong>Type:</strong> @Model.NotificationType</p>
+        <p><strong>Urgency:</strong> @Model.Urgency</p>
+        <p><strong>Priority:</strong> @Model.Priority</p>
+        <p><strong>Expires At:</strong> @Model.ExpiresAt?.ToString("yyyy-MM-dd HH:mm")</p>
+    </div>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="NotificationId" />
+
+    @* Validation summary for any errors *@
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

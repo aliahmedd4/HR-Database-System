@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Create Notification";
+}
+
+<h2>Create Notification</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group mb-3">
+        <label for="title">Title</label>
+        <input type="text" name="title" class="form-control" required />
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="messageContent">Message</label>
+        <textarea name="messageContent" class="form-control" rows="4" required></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="priority">Priority</label>
+        <select name="priority" class="form-control">
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+            <option value="Normal" selected>Normal</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="notificationType">Notification Type</label>
+        <select name="notificationType" class="form-control">
+            <option value="General">General</option>
+            <option value="System">System</option>
+            <option value="HR">HR</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Select Employees</label>
+        <div class="border p-2" style="max-height:300px; overflow-y:auto;">
+            @if (ViewBag.TeamMembers != null)
+            {
+                foreach (var emp in ViewBag.TeamMembers)
+                {
+                    <div class="form-check">
+                        <input type="checkbox" name="selectedEmployees" value="@emp.EmployeeId" class="form-check-input" />
+                        <label class="form-check-label">@emp.FullName (@emp.Email)</label>
+                    </div>
+                }
+            }
+            else if (ViewBag.AllEmployees != null)
+            {
+                foreach (var emp in ViewBag.AllEmployees)
+                {
+                    <div class="form-check">
+                        <input type="checkbox" name="selectedEmployees" value="@emp.EmployeeId" class="form-check-input" />
+                        <label class="form-check-label">@emp.FullName (@emp.Email)</label>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">No employees available to send notifications.</p>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Send Notification</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

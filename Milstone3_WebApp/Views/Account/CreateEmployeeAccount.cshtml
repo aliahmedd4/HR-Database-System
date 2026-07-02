@@ -1,0 +1,215 @@
+@{
+    ViewData["Title"] = "Create Employee Account";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">➕ Create Employee Account</h3>
+                    <p class="mb-0 small">System Admin: Create accounts for new employees</p>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @ViewBag.Error
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form method="post" asp-action="CreateEmployeeAccount" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <h5 class="mb-3 text-primary">Basic Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                <div class="invalid-feedback">Please provide a first name.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                <div class="invalid-feedback">Please provide a last name.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">Please provide a valid email address.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1-555-0123">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nationalId" class="form-label">National ID</label>
+                                <input type="text" class="form-control" id="nationalId" name="nationalId">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="countryOfBirth" class="form-label">Country of Birth</label>
+                            <input type="text" class="form-control" id="countryOfBirth" name="countryOfBirth" placeholder="e.g., Egypt">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3 text-primary">Employment Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="">-- Select Role --</option>
+                                    <option value="Employee">👤 Employee</option>
+                                    <option value="LineManager">👔 Line Manager</option>
+                                    <option value="HRAdmin">🛡️ HR Admin</option>
+                                    <option value="SystemAdmin">🔐 System Admin</option>
+                                    <option value="Executive">⭐ Executive</option>
+                                    <option value="PayrollFinance">💰 Payroll / Finance</option>
+                                    <option value="Recruiter">🎯 Recruiter</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a role.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="departmentId" class="form-label">Department</label>
+                                <select class="form-select" id="departmentId" name="departmentId">
+                                    <option value="">-- Select Department --</option>
+                                    @if (ViewData["DepartmentId"] != null)
+                                    {
+                                        @foreach (var item in (SelectList)ViewData["DepartmentId"])
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="positionId" class="form-label">Position</label>
+                                <select class="form-select" id="positionId" name="positionId">
+                                    <option value="">-- Select Position --</option>
+                                    @if (ViewData["PositionId"] != null)
+                                    {
+                                        @foreach (var item in (SelectList)ViewData["PositionId"])
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="managerId" class="form-label">Manager</label>
+                                <select class="form-select" id="managerId" name="managerId">
+                                    <option value="">-- Select Manager --</option>
+                                    @if (ViewData["ManagerId"] != null)
+                                    {
+                                        @foreach (var item in (SelectList)ViewData["ManagerId"])
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contractId" class="form-label">Contract Type</label>
+                                <select class="form-select" id="contractId" name="contractId">
+                                    <option value="">-- Select Contract Type --</option>
+                                    @if (ViewData["ContractId"] != null)
+                                    {
+                                        @foreach (var item in (SelectList)ViewData["ContractId"])
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="baseSalary" class="form-label">Base Salary</label>
+                                <input type="number" step="0.01" class="form-control" id="baseSalary" name="baseSalary" placeholder="50000.00">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3 text-primary">Contact Information</h5>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="2" placeholder="Street address, City, Country"></textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3 text-primary">Emergency Contact</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="emergencyContactName" class="form-label">Contact Name</label>
+                                <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="emergencyContactPhone" class="form-label">Contact Phone</label>
+                                <input type="tel" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="relationship" class="form-label">Relationship</label>
+                                <input type="text" class="form-control" id="relationship" name="relationship" placeholder="e.g., Spouse, Parent">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-4">
+                            <strong>ℹ️ Note:</strong> The employee will be able to log in using their email and the default password for their role. They should change their password after first login.
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" asp-controller="Employees" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">✨ Create Employee Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bootstrap form validation
+    (function() {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+

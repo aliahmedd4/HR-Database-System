@@ -1,0 +1,109 @@
+@model IEnumerable<Milstone3_WebApp.Employee>
+
+@{
+    ViewData["Title"] = "My Team";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>My Team</h2>
+    <p class="mb-0">Team members reporting to @ViewBag.ManagerName (@ViewBag.ManagerPosition)</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Team Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h3 class="text-primary">@Model.Count()</h3>
+                            <p class="text-muted mb-0">Team Members</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h3 class="text-success">@Model.Count(e => e.IsActive == true)</h3>
+                            <p class="text-muted mb-0">Active Members</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h3 class="text-info">@Model.Select(e => e.DepartmentId).Distinct().Count()</h3>
+                            <p class="text-muted mb-0">Departments</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h3 class="text-warning">@Model.Select(e => e.PositionId).Distinct().Count()</h3>
+                            <p class="text-muted mb-0">Positions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Employee Code</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Position</th>
+                    <th>Contract</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Model)
+                {
+                    <tr>
+                        <td>@member.EmployeeCode</td>
+                        <td><strong>@member.FullName</strong></td>
+                        <td>@member.Email</td>
+                        <td>@member.Phone</td>
+                        <td>@member.Department?.DepartmentName</td>
+                        <td>@member.Position?.PositionTitle</td>
+                        <td>@member.Contract?.ContractType</td>
+                        <td>
+                            @if (member.IsActive == true)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@member.EmployeeId" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h5>No Team Members</h5>
+        <p>You don't have any team members reporting to you yet.</p>
+    </div>
+}
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Back to Employees List</a>
+    <a asp-controller="Hierarchy" asp-action="TeamView" asp-route-id="@ViewBag.ManagerId" class="btn btn-primary">View Team Hierarchy</a>
+</div>
+

@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Milstone3_WebApp.Employee>
+@{
+    ViewData["Title"] = "Employees";
+}
+<h1>Employees</h1>
+@if (User.IsInRole("LineManager"))
+{
+    <div class="alert alert-info mb-3">
+        <strong>Manager View:</strong> You are viewing your team members. 
+        <a asp-action="MyTeam" class="btn btn-sm btn-primary">View My Team Details</a>
+    </div>
+}
+@if (User.IsInRole("SystemAdmin") || User.IsInRole("HRAdmin"))
+{
+    <div class="alert alert-success mb-3">
+        <strong>Admin View:</strong> You can view all employees across all departments.
+    </div>
+}
+@if (User.IsInRole("HRAdmin"))
+{
+    <p>
+        <a asp-action="ManageProfileCompleteness" class="btn btn-info">📊 Manage Profile Completeness</a>
+    </p>
+}
+<p>
+    <a asp-controller="Employees" asp-action="Create" class="btn btn-primary">Create Employee Record</a>
+    @if (User.IsInRole("SystemAdmin"))
+    {
+        <a asp-controller="Account" asp-action="CreateEmployeeAccount" class="btn btn-success">➕ Create Employee Account</a>
+    }
+    @if (User.IsInRole("LineManager"))
+    {
+        <a asp-action="MyTeam" class="btn btn-info">👥 My Team</a>
+    }
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee Code</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Department</th>
+            <th>Position</th>
+            <th>Contract</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.EmployeeCode</td>
+                    <td>@item.FullName</td>
+                    <td>@item.Email</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Department?.DepartmentName</td>
+                    <td>@item.Position?.PositionTitle</td>
+                    <td>@item.Contract?.ContractType</td>
+                    <td class="text-nowrap">
+                        <div class="btn-group" role="group">
+                            @if (User.IsInRole("HRAdmin"))
+                            {
+                                <a asp-controller="Employees" asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-warning btn-sm">Edit</a>
+                            }
+                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeId" class="btn btn-info btn-sm">Details</a>
+                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="8">No employees found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

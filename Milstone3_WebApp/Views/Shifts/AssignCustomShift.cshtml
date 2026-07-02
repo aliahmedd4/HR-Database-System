@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Assign Custom Shift";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Assign Custom/Special Shift</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="AssignCustomShift" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Employee</label>
+                        <select name="employeeId" class="form-select" asp-items="ViewBag.EmployeeId" required>
+                            <option value="">-- Select Employee --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Shift Name</label>
+                        <input name="shiftName" class="form-control" required placeholder="e.g., Special Night Shift" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Time</label>
+                            <input name="startTime" class="form-control" type="time" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Time</label>
+                            <input name="endTime" class="form-control" type="time" required />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input name="startDate" class="form-control" type="date" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Date (Optional)</label>
+                            <input name="endDate" class="form-control" type="date" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Break Duration (minutes)</label>
+                        <input name="breakDuration" class="form-control" type="number" min="0" value="0" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create & Assign Custom Shift</button>
+                        <a asp-action="Assignments" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

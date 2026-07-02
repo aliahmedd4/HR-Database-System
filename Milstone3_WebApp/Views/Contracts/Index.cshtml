@@ -1,0 +1,157 @@
+﻿@model IEnumerable<Milstone3_WebApp.Contract>
+
+@{
+    ViewData["Title"] = "Contracts Management";
+    var activeContracts = ViewData["ActiveContracts"] as List<Milstone3_WebApp.Contract> ?? new List<Milstone3_WebApp.Contract>();
+    var expiringContracts = ViewData["ExpiringContracts"] as List<Milstone3_WebApp.Contract> ?? new List<Milstone3_WebApp.Contract>();
+    var today = (DateOnly)ViewData["Today"]!;
+    var expirationThreshold = (DateOnly)ViewData["ExpirationThreshold"]!;
+}
+
+<h1>Contracts Management</h1>
+
+@if (User.IsInRole("HRAdmin"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New Contract</a>
+    </p>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Expiring Contracts Section -->
+@if (expiringContracts.Any())
+{
+    <div class="alert alert-warning">
+        <h3>⚠️ Contracts Expiring Soon (within 30 days)</h3>
+        <p class="mb-0">The following contracts are expiring soon and may need renewal.</p>
+    </div>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-warning table-striped">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Contract Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Days Until Expiration</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in expiringContracts)
+                {
+                    var daysUntilExpiration = item.EndDate.HasValue 
+                        ? (item.EndDate.Value.DayNumber - today.DayNumber) 
+                        : 0;
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
+                        <td>@Html.DisplayFor(modelItem => item.ContractType)</td>
+                        <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
+                        <td>
+                            @if (item.EndDate.HasValue)
+                            {
+                                @Html.DisplayFor(modelItem => item.EndDate)
+                            }
+                            else
+                            {
+                                <span class="text-muted">Indefinite</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.EndDate.HasValue)
+                            {
+                                <span class="badge bg-danger">@daysUntilExpiration days</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-warning">@Html.DisplayFor(modelItem => item.CurrentState)</span>
+                        </td>
+                        <td>
+                            @if (User.IsInRole("HRAdmin"))
+                            {
+                                <a asp-action="Renew" asp-route-id="@item.ContractId" class="btn btn-sm btn-warning">Renew</a>
+                                <span>|</span>
+                                <a asp-action="Edit" asp-route-id="@item.ContractId" class="btn btn-sm btn-secondary">Edit</a>
+                                <span>|</span>
+                            }
+                            <a asp-action="Details" asp-route-id="@item.ContractId" class="btn btn-sm btn-info">Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<!-- Active Contracts Section -->
+<h3>Active Contracts</h3>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Contract Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (activeContracts.Any())
+            {
+                @foreach (var item in activeContracts)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
+                        <td>@Html.DisplayFor(modelItem => item.ContractType)</td>
+                        <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
+                        <td>
+                            @if (item.EndDate.HasValue)
+                            {
+                                @Html.DisplayFor(modelItem => item.EndDate)
+                            }
+                            else
+                            {
+                                <span class="text-muted">Indefinite</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.CurrentState)</span>
+                        </td>
+                        <td>
+                            @if (item.CreatedAt.HasValue)
+                            {
+                                @item.CreatedAt.Value.ToString("yyyy-MM-dd")
+                            }
+                        </td>
+                        <td>
+                            @if (User.IsInRole("HRAdmin"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.ContractId" class="btn btn-sm btn-secondary">Edit</a>
+                                <span>|</span>
+                            }
+                            <a asp-action="Details" asp-route-id="@item.ContractId" class="btn btn-sm btn-info">Details</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No active contracts found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

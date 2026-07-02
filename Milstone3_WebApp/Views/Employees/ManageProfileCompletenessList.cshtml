@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Manage Profile Completeness";
+    var employeesWithCompleteness = ViewBag.EmployeesWithCompleteness as List<dynamic> ?? new List<dynamic>();
+}
+
+<h1>Profile Completeness Management</h1>
+<p class="text-muted">View and manage profile completeness for all employees.</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Employee Code</th>
+                <th>Full Name</th>
+                <th>Department</th>
+                <th>Position</th>
+                <th>Completeness</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in employeesWithCompleteness)
+            {
+                var employee = item.Employee as Milstone3_WebApp.Employee;
+                var completeness = (int)item.CompletenessPercentage;
+                var statusClass = completeness >= 100 ? "success" : completeness >= 75 ? "warning" : "danger";
+                var statusText = completeness >= 100 ? "Complete" : completeness >= 75 ? "Mostly Complete" : "Incomplete";
+                
+                <tr>
+                    <td>@employee.EmployeeCode</td>
+                    <td>@employee.FullName</td>
+                    <td>@(employee.Department?.DepartmentName ?? "N/A")</td>
+                    <td>@(employee.Position?.PositionTitle ?? "N/A")</td>
+                    <td>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-@statusClass" role="progressbar" 
+                                 style="width: @completeness%" 
+                                 aria-valuenow="@completeness" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                @completeness%
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-@statusClass">@statusText</span>
+                        @if (employee.ProfileCompletion == true)
+                        {
+                            <span class="badge bg-success">Marked Complete</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="ManageProfileCompleteness" asp-route-id="@employee.EmployeeId" 
+                           class="btn btn-sm btn-primary">Manage</a>
+                        <a asp-action="Details" asp-route-id="@employee.EmployeeId" 
+                           class="btn btn-sm btn-info">View Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to Employee List</a>
+</div>
+

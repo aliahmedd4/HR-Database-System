@@ -1,0 +1,74 @@
+﻿@model Milstone3_WebApp.Leave
+
+@{
+    ViewData["Title"] = "Edit Leave Type";
+}
+
+<div class="welcome-banner">
+    <h2>Edit Leave Type</h2>
+    <p>Update the leave type details below and save changes.</p>
+</div>
+
+<div class="card">
+    <form asp-action="Edit" class="form-grid">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="LeaveId" />
+
+        <!-- Leave Type -->
+        <div class="form-group">
+            <label asp-for="LeaveType"></label>
+            <input asp-for="LeaveType" class="form-control" />
+            <span asp-validation-for="LeaveType" class="text-danger"></span>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label asp-for="LeaveDescription"></label>
+            <input asp-for="LeaveDescription" class="form-control" />
+            <span asp-validation-for="LeaveDescription" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <!-- Rules -->
+        <div class="form-group">
+            <label asp-for="IsPaid"></label>
+            <input asp-for="IsPaid" class="form-control" />
+            <span asp-validation-for="IsPaid" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MaxDaysPerYear"></label>
+            <input asp-for="MaxDaysPerYear" class="form-control" />
+            <span asp-validation-for="MaxDaysPerYear" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="RequiresApproval"></label>
+            <input asp-for="RequiresApproval" class="form-control" />
+            <span asp-validation-for="RequiresApproval" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IsActive"></label>
+            <input asp-for="IsActive" class="form-control" />
+            <span asp-validation-for="IsActive" class="text-danger"></span>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,158 @@
+﻿@model Milstone3_WebApp.Models.LeaveRequestDto
+
+@{
+    ViewData["Title"] = "Request Leave";
+}
+
+<div class="welcome-banner">
+    <h2>Request Leave</h2>
+    <p>Submit a new leave request below.</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm p-4">
+    <form asp-action="Create" method="post" class="form-grid" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- Leave Type -->
+        <div class="form-group mb-3">
+            <label for="LeaveType" class="form-label"><strong>Leave Type <span class="text-danger">*</span></strong></label>
+            <input type="text" id="LeaveType" name="LeaveType" class="form-control" 
+                   placeholder="e.g., Sick, Vacation, Probation, Holiday, Special" required 
+                   value="@(Model?.LeaveType ?? "")" />
+            <small class="form-text text-muted">
+                Enter leave type: Sick, Probation, Vacation, Holiday, or Special
+            </small>
+            <span asp-validation-for="LeaveType" class="text-danger"></span>
+        </div>
+        
+        <!-- Hidden field for LeaveId (will be resolved by controller) -->
+        <input type="hidden" asp-for="LeaveId" value="0" />
+
+        <!-- Start Date -->
+        <div class="form-group mb-3">
+            <label asp-for="StartDate" class="form-label"><strong>Start Date <span class="text-danger">*</span></strong></label>
+            <input asp-for="StartDate" type="date" class="form-control" required 
+                   value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+
+        <!-- End Date -->
+        <div class="form-group mb-3">
+            <label asp-for="EndDate" class="form-label"><strong>End Date <span class="text-danger">*</span></strong></label>
+            <input asp-for="EndDate" type="date" class="form-control" required 
+                   value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                   min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+            <small class="form-text text-muted" id="daysCount"></small>
+        </div>
+
+        <!-- Reason -->
+        <div class="form-group mb-3">
+            <label asp-for="Reason" class="form-label"><strong>Reason / Comments</strong></label>
+            <textarea asp-for="Reason" class="form-control" rows="4" 
+                      placeholder="Please provide a reason for your leave request..."></textarea>
+            <span asp-validation-for="Reason" class="text-danger"></span>
+        </div>
+
+        <!-- Justification (Alternative field) -->
+        <div class="form-group mb-3">
+            <label asp-for="Justification" class="form-label"><strong>Justification</strong></label>
+            <textarea asp-for="Justification" class="form-control" rows="3" 
+                      placeholder="Additional justification if needed..."></textarea>
+            <span asp-validation-for="Justification" class="text-danger"></span>
+        </div>
+
+        <!-- Attachment -->
+        <div class="form-group mb-3">
+            <label for="AttachmentFile" class="form-label"><strong>Attachment (Optional)</strong></label>
+            <input type="file" name="AttachmentFile" class="form-control" 
+                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" />
+            <small class="form-text text-muted">
+                Supported formats: PDF, DOC, DOCX, JPG, PNG (Max 10MB)
+            </small>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-group d-flex justify-content-between mt-4">
+            <a asp-action="MyLeaveHistory" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-send"></i> Submit Leave Request
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="mt-3">
+    <div class="alert alert-info">
+        <h6><i class="bi bi-info-circle"></i> Important Notes:</h6>
+        <ul class="mb-0">
+            <li>Leave requests require manager approval</li>
+            <li>Please submit requests at least 3 days in advance when possible</li>
+            <li>You will receive a notification once your request is reviewed</li>
+            <li>You can track your request status in the Leave History page</li>
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Calculate and display number of days
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.querySelector('input[name="StartDate"]');
+            const endDateInput = document.querySelector('input[name="EndDate"]');
+            const daysCount = document.getElementById('daysCount');
+
+            function calculateDays() {
+                if (!startDateInput || !endDateInput || !daysCount) return;
+                
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+                
+                if (start && end && !isNaN(start.getTime()) && !isNaN(end.getTime()) && end >= start) {
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    daysCount.textContent = `Total days: ${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+                    daysCount.style.color = 'green';
+                } else {
+                    daysCount.textContent = '';
+                }
+            }
+
+            if (startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', function() {
+                    if (endDateInput) {
+                        endDateInput.min = startDateInput.value;
+                    }
+                    calculateDays();
+                });
+
+                endDateInput.addEventListener('change', calculateDays);
+                
+                // Calculate on page load
+                calculateDays();
+            }
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

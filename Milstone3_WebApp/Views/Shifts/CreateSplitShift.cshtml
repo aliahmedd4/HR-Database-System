@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Create Split Shift";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Create Split Shift</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="CreateSplitShift" method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Split Shift Name</label>
+                        <input name="name" class="form-control" required placeholder="e.g., Split Morning-Evening" />
+                    </div>
+
+                    <h5 class="mt-4">First Part</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Time</label>
+                            <input name="firstStart" class="form-control" type="time" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Time</label>
+                            <input name="firstEnd" class="form-control" type="time" required />
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">Second Part</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Time</label>
+                            <input name="secondStart" class="form-control" type="time" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Time</label>
+                            <input name="secondEnd" class="form-control" type="time" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Break Duration Between Parts (minutes)</label>
+                        <input name="breakDuration" class="form-control" type="number" min="0" value="60" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Split Shift</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

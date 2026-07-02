@@ -1,0 +1,74 @@
+@model IEnumerable<object>
+@{
+    ViewData["Title"] = "Team Attendance Summary";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Team Attendance Summary</h2>
+    <div>
+        <form method="get" class="row g-2">
+            <div class="col-auto">
+                <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-auto">
+                <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<p class="text-muted">Manager: <strong>@ViewBag.ManagerName</strong></p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Total Days</th>
+                <th>Present</th>
+                <th>Absent</th>
+                <th>On Leave</th>
+                <th>Late Days</th>
+                <th>Total Lateness (mins)</th>
+                <th>Total Overtime (hrs)</th>
+                <th>Attendance Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (dynamic item in Model)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Attendance" asp-action="Index" asp-route-employeeId="@item.EmployeeId">
+                            @item.EmployeeName
+                        </a>
+                    </td>
+                    <td>@item.TotalDays</td>
+                    <td><span class="badge bg-success">@item.PresentDays</span></td>
+                    <td><span class="badge bg-danger">@item.AbsentDays</span></td>
+                    <td><span class="badge bg-info">@item.LeaveDays</span></td>
+                    <td><span class="badge bg-warning">@item.LateDays</span></td>
+                    <td>@item.TotalLateness</td>
+                    <td>@item.TotalOvertime.ToString("F2")</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar @(item.AttendanceRate >= 90 ? "bg-success" : item.AttendanceRate >= 70 ? "bg-warning" : "bg-danger")" 
+                                 role="progressbar" style="width: @item.AttendanceRate%">
+                                @item.AttendanceRate.ToString("F1")%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No team members found or no attendance data available.</div>
+}
+

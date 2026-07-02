@@ -1,0 +1,85 @@
+@model Milstone3_WebApp.Employee
+
+@{
+    ViewData["Title"] = "Assign Roles";
+    var employee = ViewBag.Employee as Milstone3_WebApp.Employee;
+    var allRoles = ViewBag.AllRoles as List<Milstone3_WebApp.Role> ?? new List<Milstone3_WebApp.Role>();
+    var currentRoleIds = ViewBag.CurrentRoleIds as List<int> ?? new List<int>();
+}
+
+<h1>Assign Roles to Employee</h1>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Employee Information</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Name:</dt>
+            <dd class="col-sm-9">@employee?.FullName</dd>
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">@employee?.Email</dd>
+            <dt class="col-sm-3">Employee Code:</dt>
+            <dd class="col-sm-9">@employee?.EmployeeCode</dd>
+        </dl>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="AssignRole" method="post">
+    <input type="hidden" name="employeeId" value="@employee?.EmployeeId" />
+    
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">Select Roles</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Select one or more roles to assign to this employee. You can assign multiple roles.</p>
+            
+            @if (allRoles.Any())
+            {
+                <div class="row">
+                    @foreach (var role in allRoles)
+                    {
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="selectedRoles" 
+                                       value="@role.RoleId" 
+                                       id="role_@role.RoleId"
+                                       @(currentRoleIds.Contains(role.RoleId) ? "checked" : "") />
+                                <label class="form-check-label" for="role_@role.RoleId">
+                                    <strong>@role.RoleName</strong>
+                                    @if (!string.IsNullOrEmpty(role.Purpose))
+                                    {
+                                        <br /><small class="text-muted">@role.Purpose</small>
+                                    }
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    No roles available in the system. Please create roles first.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">Assign Selected Roles</button>
+        <a asp-action="Details" asp-route-id="@employee?.EmployeeId" class="btn btn-secondary">Cancel</a>
+        <a asp-action="Index" class="btn btn-info">Back to Employees List</a>
+    </div>
+</form>
+

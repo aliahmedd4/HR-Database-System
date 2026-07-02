@@ -1,0 +1,6 @@
+Msg 1801, Level 16, State 3, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Line 3
+Database 'HR_Payroll_System' already exists. Choose a different database name.
+Msg 1767, Level 16, State 1, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Line 2
+Foreign key 'FK__Attendanc__devic__4F47C5E3' references invalid table 'Device'.
+Msg 1750, Level 16, State 1, Server LAPTOP-1VO6JGF9\LOCALDB#5FA8783F, Line 2
+Could not create constraint or index. See previous errors.

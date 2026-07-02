@@ -1,0 +1,103 @@
+@model IEnumerable<Milstone3_WebApp.AttendanceCorrectionRequest>
+@{
+    ViewData["Title"] = "Attendance Correction Requests";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Attendance Correction Requests</h2>
+    <div class="btn-group" role="group">
+        <a asp-action="CorrectionRequests" asp-route-status="Pending" class="btn btn-outline-warning @(ViewBag.Status == "Pending" ? "active" : "")">Pending</a>
+        <a asp-action="CorrectionRequests" asp-route-status="Approved" class="btn btn-outline-success @(ViewBag.Status == "Approved" ? "active" : "")">Approved</a>
+        <a asp-action="CorrectionRequests" asp-route-status="Rejected" class="btn btn-outline-danger @(ViewBag.Status == "Rejected" ? "active" : "")">Rejected</a>
+        <a asp-action="CorrectionRequests" asp-route-status="All" class="btn btn-outline-secondary @(ViewBag.Status == "All" ? "active" : "")">All</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Date</th>
+                <th>Correction Type</th>
+                <th>Requested Check-In</th>
+                <th>Requested Check-Out</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Employee.FullName</td>
+                    <td>@item.AttendanceDate.ToString("MMM dd, yyyy")</td>
+                    <td>@item.CorrectionType</td>
+                    <td>@(item.RequestedCheckIn?.ToString("HH:mm") ?? "-")</td>
+                    <td>@(item.RequestedCheckOut?.ToString("HH:mm") ?? "-")</td>
+                    <td>@(item.Reason?.Length > 50 ? item.Reason.Substring(0, 50) + "..." : item.Reason)</td>
+                    <td>
+                        <span class="badge bg-@(item.Status == "Approved" ? "success" : item.Status == "Rejected" ? "danger" : "warning")">
+                            @item.Status
+                        </span>
+                    </td>
+                    <td>
+                        @if (item.Status == "Pending")
+                        {
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#reviewModal@(item.RequestId)">Review</button>
+                        }
+                        else
+                        {
+                            <small class="text-muted">@(item.ReviewNotes ?? "No notes")</small>
+                        }
+                    </td>
+                </tr>
+
+                <!-- Review Modal -->
+                @if (item.Status == "Pending")
+                {
+                    <div class="modal fade" id="reviewModal@(item.RequestId)" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Review Correction Request</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form asp-action="ReviewCorrectionRequest" method="post">
+                                    <input type="hidden" name="requestId" value="@item.RequestId" />
+                                    <div class="modal-body">
+                                        <p><strong>Employee:</strong> @item.Employee.FullName</p>
+                                        <p><strong>Date:</strong> @item.AttendanceDate.ToString("MMM dd, yyyy")</p>
+                                        <p><strong>Reason:</strong> @item.Reason</p>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Review Notes</label>
+                                            <textarea name="reviewNotes" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" name="action" value="Approve" class="btn btn-success">Approve</button>
+                                        <button type="submit" name="action" value="Reject" class="btn btn-danger">Reject</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No correction requests found.</div>
+}
+

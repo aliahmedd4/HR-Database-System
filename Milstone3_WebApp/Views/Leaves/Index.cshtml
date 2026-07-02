@@ -1,0 +1,90 @@
+﻿@model IEnumerable<Milstone3_WebApp.Leave>
+
+@{
+    ViewData["Title"] = "Leave Types";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>Leave Types</h2>
+    <p>Browse all leave types defined in the HRMS system.</p>
+    @if (User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+    {
+        <a asp-action="CreateLeaveType" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Leave Type
+        </a>
+    }
+    @if (User.IsInRole("Employee") || User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+    {
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-file-plus"></i> Request Leave
+        </a>
+        <a asp-action="MyLeaveHistory" class="btn btn-info">
+            <i class="bi bi-clock-history"></i> My Leave History
+        </a>
+        <a asp-action="Balance" class="btn btn-secondary">
+            <i class="bi bi-calendar-check"></i> My Leave Balance
+        </a>
+    }
+    @if (User.IsInRole("LineManager") || User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+    {
+        <a asp-action="Pending" class="btn btn-warning">
+            <i class="bi bi-inbox"></i> Team Leave Requests
+        </a>
+    }
+    @if (User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+    {
+        <a asp-action="AllLeaveRequests" class="btn btn-primary">
+            <i class="bi bi-list-ul"></i> All Leave Requests
+        </a>
+        <a asp-action="ManageLeaveEntitlements" class="btn btn-info">
+            <i class="bi bi-person-check"></i> Manage Entitlements
+        </a>
+        <a asp-action="ManageSpecialLeaves" class="btn btn-secondary">
+            <i class="bi bi-star"></i> Special Leaves
+        </a>
+        <a asp-action="ConfigureLeavePolicies" class="btn btn-secondary">
+            <i class="bi bi-gear"></i> Configure Policies
+        </a>
+        <a asp-action="ConfigureEligibilityRules" class="btn btn-secondary">
+            <i class="bi bi-shield-check"></i> Eligibility Rules
+        </a>
+    }
+</div>
+
+<div class="row">
+    @foreach (var leave in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">@leave.LeaveType</h5>
+                    @if (leave.IsActive == true)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Description:</strong> @leave.LeaveDescription</p>
+                    @if (!string.IsNullOrEmpty(leave.Description))
+                    {
+                        <p><strong>Notes:</strong> @leave.Description</p>
+                    }
+                    <p>💰 Paid: @(leave.IsPaid == true ? "Yes" : "No")</p>
+                    <p>📅 Max Days/Year: @leave.MaxDaysPerYear</p>
+                    <p>✅ Requires Approval: @(leave.RequiresApproval == true ? "Yes" : "No")</p>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@leave.LeaveId" class="btn btn-secondary btn-sm">View</a>
+                    <a asp-action="Edit" asp-route-id="@leave.LeaveId" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@leave.LeaveId" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

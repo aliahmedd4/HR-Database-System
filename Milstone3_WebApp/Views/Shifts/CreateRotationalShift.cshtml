@@ -1,0 +1,119 @@
+@model Milstone3_WebApp.ShiftCycle
+@{
+    ViewData["Title"] = "Create Rotational Shift";
+}
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Create Rotational Shift Cycle</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="CreateRotationalShift" method="post" id="rotationalForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CycleName" class="form-label">Cycle Name</label>
+                            <input asp-for="CycleName" class="form-control" required placeholder="e.g., 4-Day Rotational" />
+                            <span asp-validation-for="CycleName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CycleDays" class="form-label">Cycle Days</label>
+                            <input asp-for="CycleDays" class="form-control" type="number" min="1" required />
+                            <span asp-validation-for="CycleDays" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
+                    <h5>Shift Sequence</h5>
+                    <div id="shiftSequence">
+                        <div class="shift-item mb-3 p-3 border rounded">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Shift</label>
+                                    <select name="shiftIds" class="form-select" asp-items="ViewBag.Shifts" required>
+                                        <option value="">-- Select Shift --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Day Sequence</label>
+                                    <input type="number" name="daySequences" class="form-control" min="1" value="1" required />
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger btn-sm remove-shift">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary mb-3" id="addShift">+ Add Shift</button>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Create Rotational Shift</button>
+                        <a asp-action="RotationalShifts" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let shiftCount = 1;
+        
+        document.getElementById('addShift').addEventListener('click', function() {
+            shiftCount++;
+            const shiftItem = document.createElement('div');
+            shiftItem.className = 'shift-item mb-3 p-3 border rounded';
+            shiftItem.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Shift</label>
+                        <select name="shiftIds" class="form-select" required>
+                            <option value="">-- Select Shift --</option>
+                            @foreach (var shift in ViewBag.Shifts as SelectList)
+                            {
+                                <option value="@shift.Value">@shift.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Day Sequence</label>
+                        <input type="number" name="daySequences" class="form-control" min="1" value="${shiftCount}" required />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm remove-shift">Remove</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('shiftSequence').appendChild(shiftItem);
+            
+            // Add remove functionality
+            shiftItem.querySelector('.remove-shift').addEventListener('click', function() {
+                shiftItem.remove();
+            });
+        });
+
+        // Add remove functionality to existing remove buttons
+        document.querySelectorAll('.remove-shift').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (document.querySelectorAll('.shift-item').length > 1) {
+                    this.closest('.shift-item').remove();
+                } else {
+                    alert('You must have at least one shift in the cycle.');
+                }
+            });
+        });
+    </script>
+}
+

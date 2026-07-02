@@ -1,0 +1,74 @@
+﻿@model Milstone3_WebApp.Employee
+
+@{
+    ViewData["Title"] = "Reassign Employee";
+}
+
+<div class="welcome-banner">
+    <h2>Reassign Employee</h2>
+    <p>Update the department and manager for @Model.FullName</p>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Reassign" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
+
+            <div class="form-group mb-3">
+                <label for="newManagerId">New Manager</label>
+                <select name="newManagerId" id="newManagerId" class="form-select">
+                    <option value="">No Manager</option>
+                    @if (ViewBag.PotentialManagers != null)
+                    {
+                        @foreach (var mgr in ViewBag.PotentialManagers)
+                        {
+                            <option value="@mgr.EmployeeId" selected="@(Model.ManagerId == mgr.EmployeeId)">
+                                @mgr.FullName
+                            </option>
+                        }
+                    }
+                </select>
+                <small class="form-text text-muted">Select a new manager for this employee, or leave as "No Manager"</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="newDepartmentId">New Department <span class="text-danger">*</span></label>
+                <select name="newDepartmentId" id="newDepartmentId" class="form-select" required>
+                    <option value="">-- Select Department --</option>
+                    @if (ViewBag.Departments != null)
+                    {
+                        @foreach (var dept in ViewBag.Departments)
+                        {
+                            <option value="@dept.DepartmentId" selected="@(Model.DepartmentId == dept.DepartmentId)">
+                                @dept.DepartmentName
+                            </option>
+                        }
+                    }
+                </select>
+                <small class="form-text text-muted">Select the new department for this employee</small>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Confirm Reassignment</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

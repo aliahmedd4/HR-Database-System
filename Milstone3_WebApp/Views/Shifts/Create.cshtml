@@ -1,0 +1,72 @@
+@model Milstone3_WebApp.ShiftSchedule
+@{
+    ViewData["Title"] = "Create Shift Type";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Create New Shift Type</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Shift Name</label>
+                        <input asp-for="Name" class="form-control" required placeholder="e.g., Morning Shift, Night Shift" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Type" class="form-label">Shift Type</label>
+                        <select asp-for="Type" class="form-select">
+                            <option value="Standard">Standard</option>
+                            <option value="Rotational">Rotational</option>
+                            <option value="Split">Split</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="StartTime" class="form-label">Start Time</label>
+                            <input asp-for="StartTime" class="form-control" type="time" required />
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="EndTime" class="form-label">End Time</label>
+                            <input asp-for="EndTime" class="form-control" type="time" required />
+                            <span asp-validation-for="EndTime" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="BreakDuration" class="form-label">Break Duration (minutes)</label>
+                            <input asp-for="BreakDuration" class="form-control" type="number" min="0" value="0" />
+                            <span asp-validation-for="BreakDuration" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="GracePeriodMinutes" class="form-label">Grace Period (minutes)</label>
+                            <input asp-for="GracePeriodMinutes" class="form-control" type="number" min="0" value="0" />
+                            <span asp-validation-for="GracePeriodMinutes" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Shift</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

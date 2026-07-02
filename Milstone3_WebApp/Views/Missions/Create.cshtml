@@ -1,0 +1,98 @@
+﻿@model Milstone3_WebApp.Mission
+
+@{
+    ViewData["Title"] = "Create Mission";
+}
+
+<div class="welcome-banner">
+    <h2>Create Mission</h2>
+    <p>Assign a new mission to an employee by filling out the details below.</p>
+</div>
+
+<div class="card">
+    <form asp-action="Create" class="form-grid" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Destination -->
+        <div class="form-group">
+            <label asp-for="Destination"></label>
+            <input asp-for="Destination" class="form-control" />
+            <span asp-validation-for="Destination" class="text-danger"></span>
+        </div>
+
+        <!-- Manager -->
+        <div class="form-group">
+            <label asp-for="ManagerId">Manager</label>
+            <select asp-for="ManagerId" class="form-control" asp-items="ViewBag.ManagerId">
+                <option value="">-- Select Manager (Optional) --</option>
+            </select>
+            <span asp-validation-for="ManagerId" class="text-danger"></span>
+        </div>
+
+        <!-- Mission Name (Required) -->
+        <div class="form-group">
+            <label asp-for="MissionName">Mission Name <span class="text-danger">*</span></label>
+            <input asp-for="MissionName" class="form-control" required />
+            <span asp-validation-for="MissionName" class="text-danger"></span>
+        </div>
+
+        <!-- Employee (Required) -->
+        <div class="form-group">
+            <label asp-for="EmployeeId">Employee <span class="text-danger">*</span></label>
+            <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId" required>
+                <option value="">-- Select Employee --</option>
+            </select>
+            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+        </div>
+
+        <!-- Dates -->
+        <div class="form-group">
+            <label asp-for="StartDate">Start Date <span class="text-danger">*</span></label>
+            <input asp-for="StartDate" type="date" class="form-control" required />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EndDate"></label>
+            <input asp-for="EndDate" type="date" class="form-control" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+            <label asp-for="Location"></label>
+            <input asp-for="Location" class="form-control" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+
+        <!-- Assigned By (Optional - will be auto-set to current user) -->
+        <div class="form-group">
+            <label asp-for="AssignedBy">Assigned By</label>
+            <select asp-for="AssignedBy" class="form-control" asp-items="ViewBag.AssignedBy">
+                <option value="">-- Auto-assigned to current user --</option>
+            </select>
+            <small class="form-text text-muted">Leave empty to auto-assign to current user</small>
+            <span asp-validation-for="AssignedBy" class="text-danger"></span>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Create Mission</button>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

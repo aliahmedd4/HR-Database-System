@@ -1,0 +1,94 @@
+﻿@model Milstone3_WebApp.Contract
+
+@{
+    ViewData["Title"] = "Edit Contract";
+}
+
+<h1>Edit Contract</h1>
+<h4>Update Contract Details</h4>
+<hr />
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ContractId" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="EmployeeId" class="control-label fw-bold">Employee <span class="text-danger">*</span></label>
+                <select asp-for="EmployeeId" class="form-select" asp-items="ViewBag.EmployeeId">
+                    <option value="">-- Select Employee --</option>
+                </select>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ContractType" class="control-label fw-bold">Contract Type <span class="text-danger">*</span></label>
+                <select asp-for="ContractType" class="form-select" asp-items="ViewBag.ContractTypes">
+                    <option value="">-- Select Contract Type --</option>
+                </select>
+                <span asp-validation-for="ContractType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="StartDate" class="control-label fw-bold">Start Date <span class="text-danger">*</span></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="EndDate" class="control-label fw-bold">End Date</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+                <small class="form-text text-muted">Leave empty for indefinite contracts</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Type" class="control-label fw-bold">Type (Optional)</label>
+                <input asp-for="Type" class="form-control" placeholder="e.g., Permanent, Temporary" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CurrentState" class="control-label fw-bold">Current State</label>
+                <select asp-for="CurrentState" class="form-select" asp-items="ViewBag.ContractStates">
+                    <option value="">-- Select State --</option>
+                </select>
+                <span asp-validation-for="CurrentState" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <input type="submit" value="Save Changes" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                <a asp-action="Details" asp-route-id="@Model.ContractId" class="btn btn-info">View Details</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0">Update Notice</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Important:</strong> When you update a contract, the employee will automatically receive a notification about the changes.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2">✓ Changes will be saved immediately</li>
+                    <li class="mb-2">✓ Employee will be notified via the notification system</li>
+                    <li class="mb-2">✓ Contract history is maintained</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,145 @@
+﻿@model Milstone3_WebApp.Payroll
+
+@{
+    ViewData["Title"] = "Edit Payroll";
+}
+
+<div class="welcome-banner">
+    <h2>Edit Payroll</h2>
+    <p>Update the payroll details below and save changes.</p>
+</div>
+
+<div class="card">
+    <form asp-action="Edit" class="form-grid">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="PayrollId" />
+
+        <!-- Employee -->
+        <div class="form-group">
+            <label asp-for="EmployeeId"></label>
+            <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
+            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+        </div>
+
+        <!-- Taxes -->
+        <div class="form-group">
+            <label asp-for="Taxes"></label>
+            <input asp-for="Taxes" class="form-control" />
+            <span asp-validation-for="Taxes" class="text-danger"></span>
+        </div>
+
+        <!-- Period -->
+        <div class="form-group">
+            <label asp-for="PeriodStart"></label>
+            <input asp-for="PeriodStart" type="date" class="form-control" />
+            <span asp-validation-for="PeriodStart" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PeriodEnd"></label>
+            <input asp-for="PeriodEnd" type="date" class="form-control" />
+            <span asp-validation-for="PeriodEnd" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PeriodId"></label>
+            <input asp-for="PeriodId" class="form-control" />
+            <span asp-validation-for="PeriodId" class="text-danger"></span>
+        </div>
+
+        <!-- Adjustments & Contributions -->
+        <div class="form-group">
+            <label asp-for="Adjustments"></label>
+            <input asp-for="Adjustments" class="form-control" />
+            <span asp-validation-for="Adjustments" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Contributions"></label>
+            <input asp-for="Contributions" class="form-control" />
+            <span asp-validation-for="Contributions" class="text-danger"></span>
+        </div>
+
+        <!-- Salary -->
+        <div class="form-group">
+            <label asp-for="ActualPay"></label>
+            <input asp-for="ActualPay" class="form-control" />
+            <span asp-validation-for="ActualPay" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NetSalary"></label>
+            <input asp-for="NetSalary" class="form-control" />
+            <span asp-validation-for="NetSalary" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="BaseAmount"></label>
+            <input asp-for="BaseAmount" class="form-control" />
+            <span asp-validation-for="BaseAmount" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="GrossSalary"></label>
+            <input asp-for="GrossSalary" class="form-control" />
+            <span asp-validation-for="GrossSalary" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TotalAllowances"></label>
+            <input asp-for="TotalAllowances" class="form-control" />
+            <span asp-validation-for="TotalAllowances" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TotalDeductions"></label>
+            <input asp-for="TotalDeductions" class="form-control" />
+            <span asp-validation-for="TotalDeductions" class="text-danger"></span>
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group">
+            <label asp-for="CurrencyId"></label>
+            <select asp-for="CurrencyId" class="form-control" asp-items="ViewBag.CurrencyId"></select>
+            <span asp-validation-for="CurrencyId" class="text-danger"></span>
+        </div>
+
+        <!-- Work -->
+        <div class="form-group">
+            <label asp-for="HoursWorked"></label>
+            <input asp-for="HoursWorked" class="form-control" />
+            <span asp-validation-for="HoursWorked" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="OvertimeHours"></label>
+            <input asp-for="OvertimeHours" class="form-control" />
+            <span asp-validation-for="OvertimeHours" class="text-danger"></span>
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+            <label asp-for="Status"></label>
+            <input asp-for="Status" class="form-control" />
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <!-- Created At -->
+        <div class="form-group">
+            <label asp-for="CreatedAt"></label>
+            <input asp-for="CreatedAt" class="form-control" readonly />
+        </div>
+
+        <!-- Actions -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,108 @@
+﻿@model Milstone3_WebApp.Contract
+
+@{
+    ViewData["Title"] = "Contract Details";
+}
+
+<h1>Contract Details</h1>
+
+<div>
+    <h4>Employment Contract</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ContractId)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ContractId)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.EmployeeId)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.EmployeeId)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ContractType)
+        </dt>
+        <dd class="col-sm-9">
+            <span class="badge bg-primary">@Html.DisplayFor(model => model.ContractType)</span>
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+        <dd class="col-sm-9">
+            @if (Model.EndDate.HasValue)
+            {
+                @Html.DisplayFor(model => model.EndDate)
+                var daysUntilExpiration = Model.EndDate.Value.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber;
+                if (daysUntilExpiration > 0 && daysUntilExpiration <= 30)
+                {
+                    <span class="badge bg-warning ms-2">Expires in @daysUntilExpiration days</span>
+                }
+                else if (daysUntilExpiration <= 0)
+                {
+                    <span class="badge bg-danger ms-2">Expired</span>
+                }
+            }
+            else
+            {
+                <span class="text-muted">Indefinite</span>
+            }
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CurrentState)
+        </dt>
+        <dd class="col-sm-9">
+            @{
+                var stateBadgeClass = Model.CurrentState switch
+                {
+                    "Active" => "bg-success",
+                    "Expired" => "bg-danger",
+                    "Terminated" => "bg-secondary",
+                    "Renewed" => "bg-info",
+                    _ => "bg-secondary"
+                };
+            }
+            <span class="badge @stateBadgeClass">@Html.DisplayFor(model => model.CurrentState)</span>
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </dt>
+        <dd class="col-sm-9">
+            @if (Model.CreatedAt.HasValue)
+            {
+                @Model.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm")
+            }
+            else
+            {
+                <span class="text-muted">Not set</span>
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    @if (User.IsInRole("HRAdmin"))
+    {
+        @if (Model.EndDate.HasValue && Model.EndDate.Value.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber <= 30)
+        {
+            <a asp-action="Renew" asp-route-id="@Model?.ContractId" class="btn btn-warning">Renew Contract</a>
+            <span>|</span>
+        }
+        <a asp-action="Edit" asp-route-id="@Model?.ContractId" class="btn btn-secondary">Edit</a>
+        <span>|</span>
+    }
+    <a asp-action="Index" class="btn btn-info">Back to List</a>
+</div>

@@ -1,0 +1,196 @@
+@{
+    ViewData["Title"] = "Record Attendance";
+    var employee = ViewBag.Employee as Milstone3_WebApp.Employee;
+    var todayAttendance = ViewBag.TodayAttendance as Milstone3_WebApp.Attendance;
+    var activeShift = ViewBag.ActiveShift as Milstone3_WebApp.ShiftSchedule;
+    var today = (DateTime)ViewBag.Today;
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Record Attendance - @today.ToString("MMMM dd, yyyy")</h3>
+            </div>
+            <div class="card-body">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+
+                <div class="mb-4">
+                    <h5>Employee: @employee?.FullName</h5>
+                    @if (activeShift != null)
+                    {
+                        <p class="text-muted">
+                            <strong>Assigned Shift:</strong> @activeShift.Name<br>
+                            <strong>Shift Time:</strong> @activeShift.StartTime.ToString("HH:mm") - @activeShift.EndTime.ToString("HH:mm")
+                            @if (activeShift.GracePeriodMinutes > 0)
+                            {
+                                <br><small class="text-info">Grace Period: @activeShift.GracePeriodMinutes minutes</small>
+                            }
+                        </p>
+                    }
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card @(todayAttendance?.EntryTime != null ? "border-success" : "border-secondary")">
+                            <div class="card-body text-center">
+                                <h5>Check-In</h5>
+                                @if (todayAttendance?.EntryTime != null)
+                                {
+                                    <p class="text-success fs-4">@todayAttendance.EntryTime.Value.ToString("HH:mm:ss")</p>
+                                    <small class="text-muted">@todayAttendance.LoginMethod</small>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">Not checked in</p>
+                                    <form method="post" asp-action="Record" class="mt-3" id="checkInForm">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="action" value="CheckIn" />
+                                        <div class="mb-2">
+                                            <select name="loginMethod" class="form-select form-select-sm">
+                                                <option value="Web">Web Portal</option>
+                                                <option value="Mobile">Mobile App</option>
+                                                <option value="Biometric">Biometric</option>
+                                                <option value="Card">Card Swipe</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Check In</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card @(todayAttendance?.ExitTime != null ? "border-success" : "border-secondary")">
+                            <div class="card-body text-center">
+                                <h5>Check-Out</h5>
+                                @if (todayAttendance?.ExitTime != null)
+                                {
+                                    <p class="text-success fs-4">@todayAttendance.ExitTime.Value.ToString("HH:mm:ss")</p>
+                                    <small class="text-muted">@todayAttendance.LogoutMethod</small>
+                                }
+                                else if (todayAttendance?.EntryTime != null)
+                                {
+                                    <p class="text-muted">Not checked out</p>
+                                    <form method="post" asp-action="Record" class="mt-3" id="checkOutForm">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="action" value="CheckOut" />
+                                        <div class="mb-2">
+                                            <select name="logoutMethod" class="form-select form-select-sm">
+                                                <option value="Web">Web Portal</option>
+                                                <option value="Mobile">Mobile App</option>
+                                                <option value="Biometric">Biometric</option>
+                                                <option value="Card">Card Swipe</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger">Check Out</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">Please check in first</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (todayAttendance != null)
+                {
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6>Today's Summary</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Hours Worked:</strong><br>
+                                    <span class="fs-5">@(todayAttendance.HoursWorked?.ToString("F2") ?? "0.00") hrs</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Overtime:</strong><br>
+                                    <span class="fs-5">@(todayAttendance.OvertimeHours?.ToString("F2") ?? "0.00") hrs</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Lateness:</strong><br>
+                                    @if (todayAttendance.LatenessMinutes > 0)
+                                    {
+                                        <span class="fs-5 text-warning">@todayAttendance.LatenessMinutes mins</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fs-5 text-success">On Time</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">View All Records</a>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Context.Request.Headers["User-Agent"].ToString()) && Context.Request.Headers["User-Agent"].ToString().Contains("Mobile"))
+                {
+                    <div class="mt-3 alert alert-info">
+                        <small><strong>Offline Mode:</strong> Your attendance will be saved locally if you're offline and synced automatically when connection is restored.</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/attendance-offline.js" asp-append-version="true"></script>
+<script>
+    // Show connection status and integrate offline sync with forms
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.AttendanceOffline) {
+            // Show offline status
+            if (!window.AttendanceOffline.isOnline()) {
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-warning';
+                alert.innerHTML = '<strong>Offline Mode:</strong> You are currently offline. Attendance will be saved locally and synced when connection is restored.';
+                document.querySelector('.card-body').insertBefore(alert, document.querySelector('.card-body').firstChild);
+            }
+
+            // Intercept form submissions for offline support
+            const checkInForm = document.getElementById('checkInForm');
+            const checkOutForm = document.getElementById('checkOutForm');
+
+            if (checkInForm) {
+                checkInForm.addEventListener('submit', function(e) {
+                    if (!window.AttendanceOffline.isOnline()) {
+                        e.preventDefault();
+                        const loginMethod = this.querySelector('select[name="loginMethod"]').value;
+                        if (window.AttendanceOffline.record('CheckIn', loginMethod, null)) {
+                            // Form submission prevented, attendance saved offline
+                            this.reset();
+                        }
+                    }
+                });
+            }
+
+            if (checkOutForm) {
+                checkOutForm.addEventListener('submit', function(e) {
+                    if (!window.AttendanceOffline.isOnline()) {
+                        e.preventDefault();
+                        const logoutMethod = this.querySelector('select[name="logoutMethod"]').value;
+                        if (window.AttendanceOffline.record('CheckOut', null, logoutMethod)) {
+                            // Form submission prevented, attendance saved offline
+                            this.reset();
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+

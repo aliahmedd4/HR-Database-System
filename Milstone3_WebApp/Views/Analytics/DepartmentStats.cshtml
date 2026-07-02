@@ -1,0 +1,23 @@
+﻿@model IEnumerable<dynamic>
+
+<div class="welcome-banner">
+    <h2>Department Statistics</h2>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Department</th>
+            <th>Employee Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stat in Model)
+        {
+            <tr>
+                <td>@stat.DepartmentName</td>
+                <td>@stat.EmployeeCount</td>
+            </tr>
+        }
+    </tbody>
+</table>

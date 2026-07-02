@@ -1,0 +1,67 @@
+@model Milstone3_WebApp.AttendanceCorrectionRequest
+@{
+    ViewData["Title"] = "Request Attendance Correction";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h3 class="mb-0">Request Attendance Correction</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="RequestCorrection" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="AttendanceDate" class="form-label">Attendance Date</label>
+                        <input asp-for="AttendanceDate" class="form-control" type="date" required />
+                        <span asp-validation-for="AttendanceDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CorrectionType" class="form-label">Correction Type</label>
+                        <select asp-for="CorrectionType" class="form-select" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="Missing Check-In">Missing Check-In</option>
+                            <option value="Missing Check-Out">Missing Check-Out</option>
+                            <option value="Wrong Time">Wrong Time</option>
+                            <option value="Forgot to Record">Forgot to Record</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="CorrectionType" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RequestedCheckIn" class="form-label">Requested Check-In Time</label>
+                            <input asp-for="RequestedCheckIn" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="RequestedCheckIn" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RequestedCheckOut" class="form-label">Requested Check-Out Time</label>
+                            <input asp-for="RequestedCheckOut" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="RequestedCheckOut" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Reason" class="form-label">Reason for Correction</label>
+                        <textarea asp-for="Reason" class="form-control" rows="4" required placeholder="Please provide a detailed reason for this correction request..."></textarea>
+                        <span asp-validation-for="Reason" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">Submit Request</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

@@ -1,0 +1,180 @@
+@model Milstone3_WebApp.Employee
+
+@{
+    ViewData["Title"] = "Manage Profile Completeness";
+    var completenessPercentage = ViewBag.CompletenessPercentage as int? ?? 0;
+}
+
+<h1>Manage Profile Completeness</h1>
+<h4>@Model.FullName</h4>
+<hr />
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Profile Completeness Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Current Completeness</label>
+                    <div class="progress" style="height: 30px;">
+                        @{
+                            var statusClass = completenessPercentage >= 100 ? "success" : completenessPercentage >= 75 ? "warning" : "danger";
+                        }
+                        <div class="progress-bar bg-@statusClass" role="progressbar" 
+                             style="width: @completenessPercentage%" 
+                             aria-valuenow="@completenessPercentage" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            @completenessPercentage%
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        @if (completenessPercentage >= 100)
+                        {
+                            <span class="text-success">Profile is complete</span>
+                        }
+                        else if (completenessPercentage >= 75)
+                        {
+                            <span class="text-warning">Profile is mostly complete</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">Profile needs completion</span>
+                        }
+                    </small>
+                </div>
+
+                <form asp-action="UpdateProfileCompleteness" method="post">
+                    <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Mark Profile as Complete</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   name="profileCompletion" 
+                                   id="profileCompletion" 
+                                   value="true"
+                                   @(Model.ProfileCompletion == true ? "checked" : "") />
+                            <label class="form-check-label" for="profileCompletion">
+                                @(Model.ProfileCompletion == true ? "Profile is marked as complete" : "Mark profile as complete")
+                            </label>
+                        </div>
+                        <small class="text-muted">
+                            This flag indicates that HR has verified the profile is complete, 
+                            regardless of the calculated percentage.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Update Completeness Status</button>
+                        <a asp-action="ManageProfileCompleteness" class="btn btn-secondary">Back to List</a>
+                        <a asp-action="Details" asp-route-id="@Model.EmployeeId" class="btn btn-info">View Employee Details</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Profile Fields Status</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>First Name</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.FirstName) ? Html.Raw("<span class='text-danger'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Last Name</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.LastName) ? Html.Raw("<span class='text-danger'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.Email) ? Html.Raw("<span class='text-danger'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Phone</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.Phone) ? Html.Raw("<span class='text-warning'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Address</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.Address) ? Html.Raw("<span class='text-warning'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Date of Birth</td>
+                            <td>@(Model.DateOfBirth.HasValue ? Html.Raw("<span class='text-success'>✓ Complete</span>") : Html.Raw("<span class='text-warning'>Missing</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>National ID</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.NationalId) ? Html.Raw("<span class='text-warning'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Department</td>
+                            <td>@(Model.DepartmentId.HasValue ? Html.Raw("<span class='text-success'>✓ Complete</span>") : Html.Raw("<span class='text-warning'>Missing</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Position</td>
+                            <td>@(Model.PositionId.HasValue ? Html.Raw("<span class='text-success'>✓ Complete</span>") : Html.Raw("<span class='text-warning'>Missing</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Emergency Contact Name</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.EmergencyContactName) ? Html.Raw("<span class='text-warning'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                        <tr>
+                            <td>Emergency Contact Phone</td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.EmergencyContactPhone) ? Html.Raw("<span class='text-warning'>Missing</span>") : Html.Raw("<span class='text-success'>✓ Complete</span>"))</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Employee Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Employee Code:</strong> @Model.EmployeeCode</p>
+                <p><strong>Email:</strong> @Model.Email</p>
+                @if (Model.Department != null)
+                {
+                    <p><strong>Department:</strong> @Model.Department.DepartmentName</p>
+                }
+                @if (Model.Position != null)
+                {
+                    <p><strong>Position:</strong> @Model.Position.PositionTitle</p>
+                }
+                <p><strong>Hire Date:</strong> @Model.HireDate.ToString("yyyy-MM-dd")</p>
+                <p><strong>Status:</strong> 
+                    @if (Model.IsActive == true)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,78 @@
+﻿@model Milstone3_WebApp.Payroll
+
+@{
+    ViewData["Title"] = "Payroll Details";
+}
+
+<div class="welcome-banner">
+    <h2>Payroll Details</h2>
+    <p>Here you can view the full information about this payroll record.</p>
+</div>
+
+<div class="card">
+    <h4>Payroll Record</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Taxes</dt>
+        <dd class="col-sm-9">@Model.Taxes</dd>
+
+        <dt class="col-sm-3">Period Start</dt>
+        <dd class="col-sm-9">@Model.PeriodStart?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Period End</dt>
+        <dd class="col-sm-9">@Model.PeriodEnd?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Period ID</dt>
+        <dd class="col-sm-9">@Model.PeriodId</dd>
+
+        <dt class="col-sm-3">Adjustments</dt>
+        <dd class="col-sm-9">@Model.Adjustments</dd>
+
+        <dt class="col-sm-3">Contributions</dt>
+        <dd class="col-sm-9">@Model.Contributions</dd>
+
+        <dt class="col-sm-3">Actual Pay</dt>
+        <dd class="col-sm-9">@Model.ActualPay</dd>
+
+        <dt class="col-sm-3">Net Salary</dt>
+        <dd class="col-sm-9">@Model.NetSalary</dd>
+
+        <dt class="col-sm-3">Payment Date</dt>
+        <dd class="col-sm-9">@Model.PaymentDate?.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Base Amount</dt>
+        <dd class="col-sm-9">@Model.BaseAmount</dd>
+
+        <dt class="col-sm-3">Gross Salary</dt>
+        <dd class="col-sm-9">@Model.GrossSalary</dd>
+
+        <dt class="col-sm-3">Total Allowances</dt>
+        <dd class="col-sm-9">@Model.TotalAllowances</dd>
+
+        <dt class="col-sm-3">Total Deductions</dt>
+        <dd class="col-sm-9">@Model.TotalDeductions</dd>
+
+        <dt class="col-sm-3">Hours Worked</dt>
+        <dd class="col-sm-9">@Model.HoursWorked</dd>
+
+        <dt class="col-sm-3">Overtime Hours</dt>
+        <dd class="col-sm-9">@Model.OvertimeHours</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+
+        <dt class="col-sm-3">Created At</dt>
+        <dd class="col-sm-9">@Model.CreatedAt</dd>
+
+        <dt class="col-sm-3">Currency</dt>
+        <dd class="col-sm-9">@Model.Currency?.CurrencyId</dd>
+
+        <dt class="col-sm-3">Employee</dt>
+        <dd class="col-sm-9">@Model.Employee?.EmployeeId</dd>
+    </dl>
+
+    <div class="form-actions">
+        <a asp-action="Edit" asp-route-id="@Model?.PayrollId" class="btn btn-primary">Edit Payroll</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Milstone3_WebApp.Employee>
+
+@{
+    ViewData["Title"] = "Department View";
+}
+
+<h2>@ViewBag.DepartmentName Department</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Position</th>
+            <th>Manager</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var emp in Model)
+        {
+            <tr>
+                <td>@emp.FullName</td>
+                <td>@emp.Position</td>
+                <td>@emp.Manager?.FullName</td>
+            </tr>
+        }
+    </tbody>
+</table>

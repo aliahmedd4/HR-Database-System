@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Milstone3_WebApp.Employee>
+
+@{
+    ViewData["Title"] = "Team View";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>@ViewBag.ManagerName's Team</h2>
+    <p>Employees reporting directly to @ViewBag.ManagerName</p>
+</div>
+
+<div class="row">
+    @foreach (var emp in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@emp.FullName</h5>
+                    <p><strong>Position:</strong> @emp.Position</p>
+                    <p><strong>Department:</strong> @emp.Department?.DepartmentName</p>
+                    <p><strong>Email:</strong> @emp.Email</p>
+                    <p><strong>Manager:</strong> @emp.Manager?.FullName</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@emp.EmployeeId" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Reassign" asp-route-id="@emp.EmployeeId" class="btn btn-warning btn-sm">Reassign</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

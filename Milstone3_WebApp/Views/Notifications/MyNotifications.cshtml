@@ -1,0 +1,178 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "My Notifications";
+}
+
+<div class="welcome-banner mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>🔔 My Notifications</h2>
+            <p class="mb-0">Stay updated with your latest notifications, @ViewBag.EmployeeName</p>
+        </div>
+        @if (ViewBag.UnreadCount > 0)
+        {
+            <div>
+                <span class="badge bg-danger" style="font-size: 1.2rem; padding: 10px 15px;">
+                    @ViewBag.UnreadCount Unread
+                </span>
+            </div>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (ViewBag.UnreadCount > 0)
+{
+    <div class="mb-3">
+        <form asp-action="MarkAllAsRead" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-primary">
+                ✓ Mark All as Read
+            </button>
+        </form>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <h4>📭 No Notifications</h4>
+        <p>You don't have any notifications yet.</p>
+    </div>
+}
+else
+{
+    <div class="notifications-container">
+        @foreach (var notification in Model)
+        {
+            var priorityColor = notification.Priority switch
+            {
+                "High" => "danger",
+                "Urgent" => "danger",
+                "Normal" => "info",
+                "Low" => "secondary",
+                _ => "info"
+            };
+
+            var typeIcon = notification.NotificationType switch
+            {
+                "Leave" => "🏖️",
+                "Payroll" => "💰",
+                "Mission" => "✈️",
+                "General" => "📢",
+                "Shift" => "🕐",
+                "Contract" => "📄",
+                _ => "🔔"
+            };
+
+            var cardClass = notification.IsRead ? "notification-card read" : "notification-card unread";
+
+            <div class="@cardClass mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="notification-icon me-2">@typeIcon</span>
+                                    <h5 class="mb-0">@notification.Title</h5>
+                                    @if (!notification.IsRead)
+                                    {
+                                        <span class="badge bg-primary ms-2">New</span>
+                                    }
+                                </div>
+
+                                <p class="notification-message mb-2">@notification.Message</p>
+
+                                <div class="notification-meta">
+                                    <small class="text-muted">
+                                        <span class="badge bg-@priorityColor me-2">@notification.Priority Priority</span>
+                                        <span>📅 @(notification.CreatedAt?.ToString("MMM dd, yyyy hh:mm tt") ?? "N/A")</span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            @if (!notification.IsRead)
+                            {
+                                <div class="ms-3">
+                                    <form asp-action="MarkAsRead" asp-route-id="@notification.EmployeeNotificationId" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Mark as read">
+                                            ✓
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<div class="mt-4">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+        .welcome-banner h2 {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+    .notifications-container {
+        max-width: 900px;
+    }
+
+    .notification-card.unread {
+        border-left: 4px solid #0d6efd;
+    }
+
+        .notification-card.unread .card {
+            background-color: #f8f9ff;
+        }
+
+    .notification-card.read .card {
+        background-color: #f8f9fa;
+        opacity: 0.85;
+    }
+
+    .notification-icon {
+        font-size: 1.5rem;
+    }
+
+    .notification-message {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .notification-meta {
+        border-top: 1px solid #e9ecef;
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .notification-card.unread .card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+</style>

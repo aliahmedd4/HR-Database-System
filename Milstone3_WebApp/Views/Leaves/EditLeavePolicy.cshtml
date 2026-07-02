@@ -1,0 +1,105 @@
+@model Milstone3_WebApp.LeavePolicy
+
+@{
+    ViewData["Title"] = "Edit Leave Policy";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>Edit Leave Policy</h2>
+    <p>Update leave policy configuration.</p>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm p-4">
+    <form asp-action="EditLeavePolicy" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="PolicyId" />
+        <input type="hidden" asp-for="LeaveId" />
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="leaveType" class="form-label"><strong>Leave Type <span class="text-danger">*</span></strong></label>
+                @{
+                    var currentLeaveType = Model.Leave?.LeaveType ?? "";
+                }
+                <input type="text" name="leaveType" id="leaveType" class="form-control" 
+                       value="@currentLeaveType" 
+                       placeholder="e.g., Sick, Vacation, Maternity" required />
+                <small class="form-text text-muted">Enter leave type name</small>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Name" class="form-label"><strong>Policy Name <span class="text-danger">*</span></strong></label>
+                <input asp-for="Name" class="form-control" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Purpose" class="form-label">Purpose</label>
+            <textarea asp-for="Purpose" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label asp-for="EligibilityMonths" class="form-label">Eligibility Months</label>
+                <input asp-for="EligibilityMonths" class="form-control" type="number" min="0" />
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label asp-for="AccrualRate" class="form-label">Accrual Rate (%)</label>
+                <input asp-for="AccrualRate" class="form-control" type="number" min="0" max="100" step="0.01" />
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label asp-for="MaxBalance" class="form-label">Max Balance (Days)</label>
+                <input asp-for="MaxBalance" class="form-control" type="number" min="0" step="0.5" />
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label asp-for="EffectiveDate" class="form-label">Effective Date</label>
+                <input asp-for="EffectiveDate" class="form-control" type="date" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EligibilityRules" class="form-label">Eligibility Rules</label>
+            <textarea asp-for="EligibilityRules" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="form-check">
+                    <input name="ResetOnNewYear" id="ResetOnNewYear" class="form-check-input" type="checkbox" value="true" checked="@(Model.ResetOnNewYear == true)" />
+                    <input type="hidden" name="ResetOnNewYear" value="false" />
+                    <label for="ResetOnNewYear" class="form-check-label">Reset on New Year</label>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="form-check">
+                    <input name="IsActive" id="IsActive" class="form-check-input" type="checkbox" value="true" checked="@(Model.IsActive == true)" />
+                    <input type="hidden" name="IsActive" value="false" />
+                    <label for="IsActive" class="form-check-label">Active</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> Save Changes
+            </button>
+            <a asp-action="ConfigureLeavePolicies" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+

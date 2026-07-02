@@ -1,0 +1,126 @@
+@model Milstone3_WebApp.ShiftSchedule
+@{
+    ViewData["Title"] = "Shift Details";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Shift Details: @Model.Name</h2>
+    <div>
+        @if (User.IsInRole("SystemAdmin"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.ShiftId" class="btn btn-primary">Edit</a>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Shift Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Shift Name:</dt>
+                    <dd class="col-sm-8">@Model.Name</dd>
+
+                    <dt class="col-sm-4">Type:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-info">@(Model.Type ?? "Standard")</span>
+                    </dd>
+
+                    <dt class="col-sm-4">Time:</dt>
+                    <dd class="col-sm-8">@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm")</dd>
+
+                    @if (Model.BreakDuration > 0)
+                    {
+                        <dt class="col-sm-4">Break Duration:</dt>
+                        <dd class="col-sm-8">@Model.BreakDuration minutes</dd>
+                    }
+
+                    @if (Model.GracePeriodMinutes > 0)
+                    {
+                        <dt class="col-sm-4">Grace Period:</dt>
+                        <dd class="col-sm-8">@Model.GracePeriodMinutes minutes</dd>
+                    }
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-@(Model.Status == "Active" ? "success" : "secondary")">
+                            @Model.Status
+                        </span>
+                    </dd>
+
+                    @if (Model.CreatedAt.HasValue)
+                    {
+                        <dt class="col-sm-4">Created At:</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.Value.ToString("MMM dd, yyyy HH:mm")</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Assigned Employees & Departments</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.ShiftAssignments != null && Model.ShiftAssignments.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Employee/Department</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var assignment in Model.ShiftAssignments.Where(sa => sa.IsActive == true))
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-info">@assignment.AssignmentType</span>
+                                        </td>
+                                        <td>
+                                            @if (assignment.Employee != null)
+                                            {
+                                                <a asp-controller="Employees" asp-action="Details" asp-route-id="@assignment.EmployeeId">
+                                                    @assignment.Employee.FullName
+                                                </a>
+                                            }
+                                            else if (assignment.Department != null)
+                                            {
+                                                <span>@assignment.Department.DepartmentName (All Employees)</span>
+                                            }
+                                        </td>
+                                        <td>@assignment.StartDate.ToString("MMM dd, yyyy")</td>
+                                        <td>@(assignment.EndDate?.ToString("MMM dd, yyyy") ?? "Ongoing")</td>
+                                        <td>
+                                            <span class="badge bg-@(assignment.IsActive == true ? "success" : "secondary")">
+                                                @(assignment.IsActive == true ? "Active" : "Inactive")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No active assignments for this shift.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

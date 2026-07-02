@@ -1,0 +1,103 @@
+@model Milstone3_WebApp.Contract
+
+@{
+    ViewData["Title"] = "Renew Contract";
+    var originalContract = ViewData["OriginalContract"] as Milstone3_WebApp.Contract;
+}
+
+<h1>Renew Contract</h1>
+<h4>Extend Contract Period</h4>
+<hr />
+
+@if (originalContract != null)
+{
+    <div class="alert alert-info">
+        <h5>Current Contract Details</h5>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Employee ID:</dt>
+            <dd class="col-sm-9">@originalContract.EmployeeId</dd>
+            <dt class="col-sm-3">Contract Type:</dt>
+            <dd class="col-sm-9">@originalContract.ContractType</dd>
+            <dt class="col-sm-3">Current Start Date:</dt>
+            <dd class="col-sm-9">@originalContract.StartDate.ToString("yyyy-MM-dd")</dd>
+            <dt class="col-sm-3">Current End Date:</dt>
+            <dd class="col-sm-9">
+                @if (originalContract.EndDate.HasValue)
+                {
+                    @originalContract.EndDate.Value.ToString("yyyy-MM-dd")
+                }
+                else
+                {
+                    <span class="text-muted">Indefinite</span>
+                }
+            </dd>
+        </dl>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Renew">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ContractId" value="@originalContract?.ContractId" />
+            <input type="hidden" asp-for="EmployeeId" value="@originalContract?.EmployeeId" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="ContractType" class="control-label fw-bold">Contract Type <span class="text-danger">*</span></label>
+                <select asp-for="ContractType" class="form-select" asp-items="ViewBag.ContractTypes">
+                    <option value="">-- Select Contract Type --</option>
+                </select>
+                <span asp-validation-for="ContractType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="StartDate" class="control-label fw-bold">New Start Date <span class="text-danger">*</span></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+                <small class="form-text text-muted">Typically the day after the current contract ends</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="EndDate" class="control-label fw-bold">New End Date</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+                <small class="form-text text-muted">Leave empty for indefinite renewal</small>
+            </div>
+
+            <div class="form-group mb-3">
+                <input type="submit" value="Renew Contract" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                <a asp-action="Details" asp-route-id="@originalContract?.ContractId" class="btn btn-info">View Details</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Contract Renewal Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">✓ The contract will be updated with new dates</li>
+                    <li class="mb-2">✓ Contract state will be set to "Active"</li>
+                    <li class="mb-2">✓ The employee will receive a notification about the renewal</li>
+                    <li class="mb-2">✓ Original contract information is preserved</li>
+                    <li class="mb-2">✓ New start date should typically be after the current end date</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

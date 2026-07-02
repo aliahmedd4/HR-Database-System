@@ -1,0 +1,56 @@
+@model IEnumerable<Milstone3_WebApp.AttendanceCorrectionRequest>
+@{
+    ViewData["Title"] = "My Correction Requests";
+}
+
+<h2>My Attendance Correction Requests</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Correction Type</th>
+                <th>Requested Check-In</th>
+                <th>Requested Check-Out</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Review Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.AttendanceDate.ToString("MMM dd, yyyy")</td>
+                    <td>@item.CorrectionType</td>
+                    <td>@(item.RequestedCheckIn?.ToString("HH:mm") ?? "-")</td>
+                    <td>@(item.RequestedCheckOut?.ToString("HH:mm") ?? "-")</td>
+                    <td>@item.Reason</td>
+                    <td>
+                        <span class="badge bg-@(item.Status == "Approved" ? "success" : item.Status == "Rejected" ? "danger" : "warning")">
+                            @item.Status
+                        </span>
+                    </td>
+                    <td>@(item.ReviewNotes ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">You have no correction requests.</div>
+}
+
+<div class="mt-3">
+    <a asp-action="RequestCorrection" class="btn btn-primary">New Request</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to Attendance</a>
+</div>
+

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Milstone3_WebApp.Notification>
+
+<div class="welcome-banner mb-4">
+    <h2>Notifications</h2>
+    <p>All system and employee notifications</p>
+</div>
+
+<div class="row">
+    @foreach (var n in Model)
+    {
+        var createdStr = n.CreatedAt.HasValue
+        ? n.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm")
+        : "N/A";
+
+        var expiresStr = n.ExpiresAt.HasValue
+        ? n.ExpiresAt.Value.ToString("yyyy-MM-dd HH:mm")
+        : "N/A";
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">@n.Title</h5>
+                    @if (n.Priority == "High")
+                    {
+                        <span class="badge bg-danger">High</span>
+                    }
+                    else if (n.Priority == "Medium")
+                    {
+                        <span class="badge bg-warning text-dark">Medium</span>
+                    }
+                    else if (n.Priority == "Low")
+                    {
+                        <span class="badge bg-success">Low</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@n.Priority</span>
+                    }
+                </div>
+                <div class="card-body">
+                    <p><strong>Message:</strong> @n.MessageContent</p>
+                    <p><strong>Type:</strong> @n.NotificationType</p>
+                    <p><strong>Priority:</strong> @n.Priority</p>
+                    <p><strong>Created:</strong> @createdStr</p>
+                    <p><strong>Expires:</strong> @expiresStr</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Details" asp-route-id="@n.NotificationId" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@n.NotificationId" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@n.NotificationId" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="mt-3">
+    <a asp-action="Create" class="btn btn-primary">Create New Notification</a>
+</div>

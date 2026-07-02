@@ -1,0 +1,58 @@
+﻿@model Milstone3_WebApp.Leave
+
+@{
+    ViewData["Title"] = "Leave Details";
+}
+
+<div class="welcome-banner mb-4">
+    <h2>Leave Details</h2>
+    <p>Here you can view the full information about this leave type.</p>
+</div>
+
+<div class="card shadow-sm p-4">
+    <h4 class="mb-3">@Model.LeaveType</h4>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3">Leave Type</dt>
+        <dd class="col-sm-9">@Model.LeaveType</dd>
+
+        <dt class="col-sm-3">Description</dt>
+        <dd class="col-sm-9">@Model.LeaveDescription</dd>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <dt class="col-sm-3">Additional Notes</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+        }
+
+        <dt class="col-sm-3">Paid Leave</dt>
+        <dd class="col-sm-9">
+            @(Model.IsPaid == true
+                        ? Html.Raw("<span class='badge bg-success'>Yes</span>")
+                        : Html.Raw("<span class='badge bg-secondary'>No</span>"))
+        </dd>
+
+        <dt class="col-sm-3">Max Days Per Year</dt>
+        <dd class="col-sm-9">@Model.MaxDaysPerYear</dd>
+
+        <dt class="col-sm-3">Requires Approval</dt>
+        <dd class="col-sm-9">
+            @(Model.RequiresApproval == true
+                        ? Html.Raw("<span class='badge bg-warning text-dark'>Yes</span>")
+                        : Html.Raw("<span class='badge bg-secondary'>No</span>"))
+        </dd>
+
+        <dt class="col-sm-3">Active</dt>
+        <dd class="col-sm-9">
+            @(Model.IsActive == true
+                        ? Html.Raw("<span class='badge bg-success'>Active</span>")
+                        : Html.Raw("<span class='badge bg-secondary'>Inactive</span>"))
+        </dd>
+    </dl>
+
+    <div class="form-actions mt-4 d-flex justify-content-between">
+        <a asp-action="Edit" asp-route-id="@Model.LeaveId" class="btn btn-primary">Edit Leave</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

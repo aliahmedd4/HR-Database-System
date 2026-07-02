@@ -1,0 +1,76 @@
+@model IEnumerable<Milstone3_WebApp.ShiftSchedule>
+@{
+    ViewData["Title"] = "Shift Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Shift Types</h2>
+    <div>
+        @if (User.IsInRole("SystemAdmin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">Create New Shift</a>
+        }
+        @if (User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+        {
+            <a asp-action="CreateSplitShift" class="btn btn-outline-info">Create Split Shift</a>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="btn-group" role="group">
+            <a asp-action="Index" class="btn btn-outline-primary active">All Shifts</a>
+            <a asp-action="RotationalShifts" class="btn btn-outline-primary">Rotational Shifts</a>
+            <a asp-action="Assignments" class="btn btn-outline-primary">Assignments</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var shift in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">@shift.Name</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Type:</strong> @(shift.Type ?? "Standard")</p>
+                    <p><strong>Time:</strong> @shift.StartTime.ToString("HH:mm") - @shift.EndTime.ToString("HH:mm")</p>
+                    @if (shift.BreakDuration > 0)
+                    {
+                        <p><strong>Break:</strong> @shift.BreakDuration minutes</p>
+                    }
+                    @if (shift.GracePeriodMinutes > 0)
+                    {
+                        <p><strong>Grace Period:</strong> @shift.GracePeriodMinutes minutes</p>
+                    }
+                    <p><strong>Status:</strong> 
+                        <span class="badge bg-@(shift.Status == "Active" ? "success" : "secondary")">
+                            @shift.Status
+                        </span>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Details" asp-route-id="@shift.ShiftId" class="btn btn-sm btn-outline-primary">Details</a>
+                    @if (User.IsInRole("SystemAdmin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@shift.ShiftId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No shifts found. @if (User.IsInRole("SystemAdmin")) { <a asp-action="Create">Create your first shift</a> }</div>
+}
+

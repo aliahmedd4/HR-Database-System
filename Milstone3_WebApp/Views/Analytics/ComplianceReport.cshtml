@@ -1,0 +1,129 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Compliance Report";
+}
+
+<div class="welcome-banner">
+    <h2>Compliance & Diversity Report</h2>
+    <p>Employee compliance data and diversity statistics</p>
+</div>
+
+<!-- Search Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" asp-action="ComplianceReport" class="row g-3">
+            <div class="col-md-4">
+                <label for="searchTerm" class="form-label">Search</label>
+                <input type="text" name="searchTerm" id="searchTerm"
+                       value="@ViewBag.SearchTerm"
+                       placeholder="Search by name, email, nationality, or department"
+                       class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label for="reportType" class="form-label">Report Type</label>
+                <select name="reportType" id="reportType" class="form-select">
+                    <option value="Compliance" selected="@(ViewBag.ReportType?.ToString() == "Compliance")">Compliance</option>
+                    <option value="Diversity" selected="@(ViewBag.ReportType?.ToString() == "Diversity")">Diversity</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Search</button>
+                <a asp-action="ComplianceReport" class="btn btn-secondary">Clear</a>
+            </div>
+        </form>
+        @if (!string.IsNullOrEmpty(ViewBag.SearchTerm as string))
+        {
+            <div class="mt-2">
+                <small class="text-muted">Showing results for: <strong>@ViewBag.SearchTerm</strong></small>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Employee Compliance Table -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h3>Employee Compliance Data</h3>
+        <p class="mb-0"><strong>Total Employees:</strong> @ViewBag.TotalEmployees</p>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Employee Name</th>
+                        <th>Email</th>
+                        <th>Nationality</th>
+                        <th>Department</th>
+                        <th>Position</th>
+                        <th>Hire Date</th>
+                        <th>Employment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var emp in Model)
+                        {
+                            <tr>
+                                <td>@emp.FullName</td>
+                                <td>@emp.Email</td>
+                                <td>@emp.Nationality</td>
+                                <td>@emp.DepartmentName</td>
+                                <td>@emp.Position</td>
+                                <td>@(emp.HireDate != null ? ((DateTime)emp.HireDate).ToString("yyyy-MM-dd") : "N/A")</td>
+                                <td>@emp.EmploymentStatus</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">No employees found matching the search criteria.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Diversity Statistics -->
+@if (ViewBag.DiversityStats != null)
+{
+    <div class="card">
+        <div class="card-header">
+            <h3>Diversity Statistics by Nationality</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nationality</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var stat in ViewBag.DiversityStats)
+                        {
+                            <tr>
+                                <td>@stat.Nationality</td>
+                                <td>@stat.Count</td>
+                                <td>@stat.Percentage.ToString("F2")%</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Navigation -->
+<div class="mt-4">
+    <a asp-action="DiversityReport" class="btn btn-primary">View Full Diversity Report</a>
+    <a asp-action="DepartmentStats" class="btn btn-secondary">View Department Statistics</a>
+</div>

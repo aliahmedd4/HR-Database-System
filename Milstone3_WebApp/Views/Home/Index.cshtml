@@ -1,0 +1,188 @@
+﻿@model IEnumerable<Milstone3_WebApp.Notification>
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="welcome-banner text-center mb-4 position-relative">
+    <div class="position-absolute top-0 end-0 mt-3 me-3">
+        <a asp-controller="Account" asp-action="Logout" class="btn btn-danger btn-sm">
+            🚪 Logout
+        </a>
+    </div>
+    <h1 class="display-4">Welcome to Milstone3 HRMS Portal</h1>
+    <p class="lead">Manage employees, attendance, shifts, leaves, missions, payrolls, notifications, analytics & hierarchy in one place.</p>
+</div>
+
+<div class="row">
+    <!-- Employees -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Employees</h5>
+                <p class="card-text">Manage employee records and profiles.</p>
+                <a asp-controller="Employees" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Attendance</h5>
+                <p class="card-text">Record and track daily attendance.</p>
+                <a asp-controller="Attendance" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shifts -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Shifts</h5>
+                <p class="card-text">Manage shift schedules and assignments.</p>
+                <a asp-controller="Shifts" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Leaves -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Leaves</h5>
+                <p class="card-text">Track leave requests and approvals.</p>
+                <a asp-controller="Leaves" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Missions -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Missions</h5>
+                <p class="card-text">Manage employee missions and assignments.</p>
+                <a asp-controller="Missions" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Payrolls -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Payrolls</h5>
+                <p class="card-text">View and process payroll records.</p>
+                <a asp-controller="Payrolls" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Notifications</h5>
+                <p class="card-text">View and manage system alerts.</p>
+                <a asp-controller="Notifications" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Analytics</h5>
+                <p class="card-text">Department stats and compliance reports.</p>
+                <a asp-controller="Analytics" asp-action="DepartmentStats" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Hierarchy -->
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Hierarchy</h5>
+                <p class="card-text">View and manage organizational hierarchy.</p>
+                <a asp-controller="Hierarchy" asp-action="Index" class="btn btn-primary">Go</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Notifications Section -->
+<div class="mt-5">
+    <h3>Recent Notifications</h3>
+    <div class="row">
+        @foreach (var n in Model.Take(3))
+        {
+            <div class="col-md-4 mb-3">
+                @await Html.PartialAsync("_NotificationCard", n)
+            </div>
+        }
+    </div>
+    <div>
+        <a asp-controller="Notifications" asp-action="Index" class="btn btn-link">View All Notifications</a>
+    </div>
+</div>
+
+<!-- Employees Table Section -->
+<div class="mt-5">
+    <h3>Employees</h3>
+    <p>
+        <a asp-controller="Employees" asp-action="Create" class="btn btn-primary">Create</a>
+    </p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Employee Code</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Position</th>
+                <th>Contract</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.Employees != null)
+            {
+                foreach (var item in (IEnumerable<Milstone3_WebApp.Employee>)ViewBag.Employees)
+                {
+                    <tr>
+                        <td>@item.EmployeeCode</td>
+                        <td>@item.FullName</td>
+                        <td>@item.Email</td>
+                        <td>@item.Phone</td>
+                        <td>@item.Department?.DepartmentName</td>
+                        <td>@item.Position?.PositionTitle</td>
+                        <td>@item.Contract?.ContractType</td>
+                        <td>
+                            <a asp-controller="Employees" asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-warning">Edit</a>
+                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeId" class="btn btn-info btn-sm">Details</a>
+                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8">No employees found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
