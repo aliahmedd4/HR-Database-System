@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Milstone3_WebApp;
 
 namespace Milstone3_WebApp.Controllers
 {
+    [Authorize(Roles = "SystemAdmin,HRAdmin,PayrollFinance")]
     public class PayrollsController : Controller
     {
         private readonly HrPayrollSystemContext _context;

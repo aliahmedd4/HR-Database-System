@@ -101,7 +101,18 @@ namespace Milstone3_WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Reassign(int? id)
         {
-            if (id == null) return NotFound();
+            // No employee chosen yet → show a picker of all employees
+            if (id == null)
+            {
+                var allEmployees = await _context.Employees
+                    .Include(e => e.Department)
+                    .Include(e => e.Position)
+                    .Include(e => e.Manager)
+                    .Where(e => e.IsActive == true)
+                    .OrderBy(e => e.FullName)
+                    .ToListAsync();
+                return View("ReassignPicker", allEmployees);
+            }
 
             var employee = await _context.Employees
                 .Include(e => e.Department)
@@ -170,7 +181,22 @@ namespace Milstone3_WebApp.Controllers
         // -------------------- DEPARTMENT VIEW --------------------
         public async Task<IActionResult> DepartmentView(int? id)
         {
-            if (id == null) return NotFound();
+            // No department chosen yet → show a picker of all departments
+            if (id == null)
+            {
+                var departments = await _context.Departments
+                    .OrderBy(d => d.DepartmentName)
+                    .ToListAsync();
+
+                var counts = await _context.Employees
+                    .Where(e => e.IsActive == true && e.DepartmentId != null)
+                    .GroupBy(e => e.DepartmentId!.Value)
+                    .Select(g => new { g.Key, C = g.Count() })
+                    .ToListAsync();
+                ViewBag.DeptCounts = counts.ToDictionary(x => x.Key, x => x.C);
+
+                return View("DepartmentPicker", departments);
+            }
 
             var department = await _context.Departments
                 .FirstOrDefaultAsync(d => d.DepartmentId == id);

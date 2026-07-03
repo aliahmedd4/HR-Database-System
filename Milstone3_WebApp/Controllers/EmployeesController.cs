@@ -175,7 +175,7 @@ namespace Milstone3_WebApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmployeeExists(employee.EmployeeId))
+                    if (!await EmployeeExists(employee.EmployeeId))
                     {
                         return NotFound();
                     }
@@ -420,7 +420,7 @@ namespace Milstone3_WebApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmployeeExists(employee.EmployeeId))
+                    if (!await EmployeeExists(employee.EmployeeId))
                     {
                         return NotFound();
                     }
@@ -546,9 +546,9 @@ namespace Milstone3_WebApp.Controllers
             return (int)Math.Round((double)completedFields / totalFields * 100);
         }
 
-        private bool EmployeeExists(int id)
+        private async Task<bool> EmployeeExists(int id)
         {
-            return _context.Employees.Any(e => e.EmployeeId == id);
+            return await _context.Employees.AnyAsync(e => e.EmployeeId == id);
         }
     }
 }

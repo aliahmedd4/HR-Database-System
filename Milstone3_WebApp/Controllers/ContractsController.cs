@@ -103,24 +103,28 @@ namespace Milstone3_WebApp.Controllers
                         contract.CurrentState = "Active";
                     }
 
+                    await using var contractTx = await _context.Database.BeginTransactionAsync();
+
                     _context.Contracts.Add(contract);
                     await _context.SaveChangesAsync();
 
-                    // Send notification to employee
-                    await _notificationService.CreateContractCreatedNotification(
-                        contract.EmployeeId,
-                        contract.ContractType ?? contract.Type ?? "Contract",
-                        contract.StartDate,
-                        contract.EndDate
-                    );
-
-                    // Update employee's contract reference
+                    // Update employee's contract reference in the same transaction
                     var employee = await _context.Employees.FindAsync(contract.EmployeeId);
                     if (employee != null)
                     {
                         employee.ContractId = contract.ContractId;
                         await _context.SaveChangesAsync();
                     }
+
+                    await contractTx.CommitAsync();
+
+                    // Send notification after commit so it only fires on success
+                    await _notificationService.CreateContractCreatedNotification(
+                        contract.EmployeeId,
+                        contract.ContractType ?? contract.Type ?? "Contract",
+                        contract.StartDate,
+                        contract.EndDate
+                    );
 
                     TempData["SuccessMessage"] = "Contract created successfully and notification sent to employee.";
                     return RedirectToAction(nameof(Index));

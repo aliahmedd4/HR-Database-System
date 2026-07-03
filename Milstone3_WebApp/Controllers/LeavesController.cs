@@ -129,6 +129,14 @@ namespace Milstone3_WebApp.Controllers
                 }
             }
 
+            // Validation: start date must not be in the past
+            if (dto.StartDate.Date < DateTime.Today)
+            {
+                ModelState.AddModelError("", "Leave start date cannot be in the past.");
+                ViewBag.EmployeeId = employeeId;
+                return View(dto);
+            }
+
             // Validation: End date must be after start date
             if (dto.EndDate < dto.StartDate)
             {
@@ -318,48 +326,38 @@ namespace Milstone3_WebApp.Controllers
                 // Get previous status to handle entitlement reversal if needed
                 var previousStatus = leaveRequest.Status;
 
-                // Update leave request directly
+                // Update leave status and entitlement atomically
+                await using var editTx = await _context.Database.BeginTransactionAsync();
+
                 leaveRequest.Status = status;
                 leaveRequest.ApprovedBy = approverId;
                 leaveRequest.ApprovedAt = DateTime.Now;
                 if (status == "Rejected" && string.IsNullOrEmpty(leaveRequest.RejectionReason))
-                {
                     leaveRequest.RejectionReason = "Rejected by manager";
-                }
-                await _context.SaveChangesAsync();
 
-                // Update LeaveEntitlement if status changed to/from Approved
-                try
+                var currentYear = DateTime.Now.Year;
+                var entitlement = await _context.LeaveEntitlements
+                    .FirstOrDefaultAsync(le => le.EmployeeId == leaveRequest.EmployeeId &&
+                                               le.LeaveId == leaveRequest.LeaveId &&
+                                               le.Year == currentYear);
+
+                if (entitlement != null)
                 {
-                    var currentYear = DateTime.Now.Year;
-                    var entitlement = await _context.LeaveEntitlements
-                        .FirstOrDefaultAsync(le => le.EmployeeId == leaveRequest.EmployeeId && 
-                                                   le.LeaveId == leaveRequest.LeaveId && 
-                                                   le.Year == currentYear);
-                    
-                    if (entitlement != null)
+                    if (previousStatus?.ToLower() == "approved" && status.ToLower() != "approved")
                     {
-                        // If previously approved and now rejected/cancelled, reverse the deduction
-                        if ((previousStatus?.ToLower() == "approved") && (status.ToLower() != "approved"))
-                        {
-                            entitlement.UsedDays = Math.Max(0, (entitlement.UsedDays ?? 0) - leaveRequest.TotalDays);
-                            entitlement.BalanceDays = (entitlement.AllocatedDays ?? 0) + (entitlement.CarryForwardDays ?? 0) - (entitlement.UsedDays ?? 0);
-                        }
-                        // If newly approved, deduct the days
-                        else if ((previousStatus?.ToLower() != "approved") && (status.ToLower() == "approved"))
-                        {
-                            entitlement.UsedDays = (entitlement.UsedDays ?? 0) + leaveRequest.TotalDays;
-                            entitlement.BalanceDays = (entitlement.AllocatedDays ?? 0) + (entitlement.CarryForwardDays ?? 0) - (entitlement.UsedDays ?? 0);
-                        }
-                        _context.LeaveEntitlements.Update(entitlement);
-                        await _context.SaveChangesAsync();
+                        entitlement.UsedDays = Math.Max(0, (entitlement.UsedDays ?? 0) - leaveRequest.TotalDays);
+                        entitlement.BalanceDays = (entitlement.AllocatedDays ?? 0) + (entitlement.CarryForwardDays ?? 0) - (entitlement.UsedDays ?? 0);
                     }
+                    else if (previousStatus?.ToLower() != "approved" && status.ToLower() == "approved")
+                    {
+                        entitlement.UsedDays = (entitlement.UsedDays ?? 0) + leaveRequest.TotalDays;
+                        entitlement.BalanceDays = (entitlement.AllocatedDays ?? 0) + (entitlement.CarryForwardDays ?? 0) - (entitlement.UsedDays ?? 0);
+                    }
+                    _context.LeaveEntitlements.Update(entitlement);
                 }
-                catch (Exception ex)
-                {
-                    // Log error but don't fail the update
-                    System.Diagnostics.Debug.WriteLine($"Leave entitlement update error during edit: {ex.Message}");
-                }
+
+                await _context.SaveChangesAsync();
+                await editTx.CommitAsync();
 
                 // If approved, sync attendance
                 if (status == "Approved")
@@ -508,7 +506,7 @@ namespace Milstone3_WebApp.Controllers
                 .Select(le => new LeaveBalanceDto
                 {
                     LeaveId = le.LeaveId,
-                    LeaveType = le.Leave.LeaveType,
+                    LeaveType = le.Leave != null ? le.Leave.LeaveType : "Unknown",
                     Allocated_Days = le.AllocatedDays ?? 0,
                     Balance_Days = le.BalanceDays ?? 0,
                     TotalDays = le.AllocatedDays ?? 0,
@@ -638,34 +636,28 @@ namespace Milstone3_WebApp.Controllers
                     return RedirectToAction(nameof(Pending));
                 }
 
-                // Update leave request status
+                // Update leave status and entitlement atomically
+                await using var approveTx = await _context.Database.BeginTransactionAsync();
+
                 leave.Status = "Approved";
                 leave.ApprovedBy = approverId;
                 leave.ApprovedAt = DateTime.Now;
-                await _context.SaveChangesAsync();
 
-                // Update LeaveEntitlement - deduct used days from balance
-                try
+                var currentYear = DateTime.Now.Year;
+                var entitlement = await _context.LeaveEntitlements
+                    .FirstOrDefaultAsync(le => le.EmployeeId == leave.EmployeeId &&
+                                               le.LeaveId == leave.LeaveId &&
+                                               le.Year == currentYear);
+
+                if (entitlement != null)
                 {
-                    var currentYear = DateTime.Now.Year;
-                    var entitlement = await _context.LeaveEntitlements
-                        .FirstOrDefaultAsync(le => le.EmployeeId == leave.EmployeeId && 
-                                                   le.LeaveId == leave.LeaveId && 
-                                                   le.Year == currentYear);
-                    
-                    if (entitlement != null)
-                    {
-                        entitlement.UsedDays = (entitlement.UsedDays ?? 0) + leave.TotalDays;
-                        entitlement.BalanceDays = (entitlement.AllocatedDays ?? 0) + (entitlement.CarryForwardDays ?? 0) - (entitlement.UsedDays ?? 0);
-                        _context.LeaveEntitlements.Update(entitlement);
-                    }
-                    await _context.SaveChangesAsync();
+                    entitlement.UsedDays = (entitlement.UsedDays ?? 0) + leave.TotalDays;
+                    entitlement.BalanceDays = (entitlement.AllocatedDays ?? 0) + (entitlement.CarryForwardDays ?? 0) - (entitlement.UsedDays ?? 0);
+                    _context.LeaveEntitlements.Update(entitlement);
                 }
-                catch (Exception ex)
-                {
-                    // Log error but don't fail the approval
-                    System.Diagnostics.Debug.WriteLine($"Leave entitlement update error: {ex.Message}");
-                }
+
+                await _context.SaveChangesAsync();
+                await approveTx.CommitAsync();
 
                 // Sync attendance - mark days as OnLeave for all days in the leave period
                 try

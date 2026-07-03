@@ -514,15 +514,26 @@ namespace Milstone3_WebApp.Controllers
                 .Where(e => e.ManagerId == manager.EmployeeId && e.IsActive == true)
                 .ToListAsync();
 
+            // Load all team attendance in one query, then group in memory (avoids N+1)
+            var memberIds = teamMembers.Select(m => m.EmployeeId).ToList();
+            var startDateOnly = DateOnly.FromDateTime(start);
+            var endDateOnly = DateOnly.FromDateTime(end);
+
+            var allAttendances = await _context.Attendances
+                .Where(a => memberIds.Contains(a.EmployeeId) &&
+                            a.AttendanceDate >= startDateOnly &&
+                            a.AttendanceDate <= endDateOnly)
+                .ToListAsync();
+
+            var attendanceByMember = allAttendances
+                .GroupBy(a => a.EmployeeId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
             var teamAttendance = new List<object>();
 
             foreach (var member in teamMembers)
             {
-                var attendances = await _context.Attendances
-                    .Where(a => a.EmployeeId == member.EmployeeId &&
-                               a.AttendanceDate >= DateOnly.FromDateTime(start) &&
-                               a.AttendanceDate <= DateOnly.FromDateTime(end))
-                    .ToListAsync();
+                var attendances = attendanceByMember.GetValueOrDefault(member.EmployeeId, new List<Attendance>());
 
                 var totalDays = (end - start).Days + 1;
                 var presentDays = attendances.Count(a => a.Status == "Present");
@@ -632,7 +643,6 @@ namespace Milstone3_WebApp.Controllers
         // -------------------- OFFLINE SYNC: SYNC OFFLINE ATTENDANCE LOGS --------------------
         [Authorize(Roles = "Employee, SystemAdmin, HRAdmin")]
         [HttpPost]
-        [IgnoreAntiforgeryToken] // JSON API endpoint doesn't need CSRF token
         public async Task<IActionResult> SyncOfflineLogs([FromBody] OfflineSyncRequest request)
         {
             var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;

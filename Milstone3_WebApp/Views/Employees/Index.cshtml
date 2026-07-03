@@ -1,82 +1,124 @@
-﻿@model IEnumerable<Milstone3_WebApp.Employee>
+@model IEnumerable<Milstone3_WebApp.Employee>
 @{
     ViewData["Title"] = "Employees";
 }
-<h1>Employees</h1>
-@if (User.IsInRole("LineManager"))
-{
-    <div class="alert alert-info mb-3">
-        <strong>Manager View:</strong> You are viewing your team members. 
-        <a asp-action="MyTeam" class="btn btn-sm btn-primary">View My Team Details</a>
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Employees</h1>
+        <p class="page-subtitle">
+            @if (User.IsInRole("LineManager")) { <text>Your team members</text> }
+            else { <text>All active employees across departments</text> }
+        </p>
     </div>
-}
-@if (User.IsInRole("SystemAdmin") || User.IsInRole("HRAdmin"))
-{
-    <div class="alert alert-success mb-3">
-        <strong>Admin View:</strong> You can view all employees across all departments.
+    <div class="d-flex gap-2">
+        @if (User.IsInRole("HRAdmin"))
+        {
+            <a asp-action="ManageProfileCompleteness" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-bar-chart me-1"></i>Profile completeness
+            </a>
+        }
+        @if (User.IsInRole("SystemAdmin"))
+        {
+            <a asp-controller="Account" asp-action="CreateEmployeeAccount" class="btn btn-primary btn-sm">
+                <i class="bi bi-person-plus me-1"></i>Create account
+            </a>
+        }
+        <a asp-action="Create" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-plus me-1"></i>Add employee
+        </a>
+        @if (User.IsInRole("LineManager"))
+        {
+            <a asp-action="MyTeam" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-people me-1"></i>My team
+            </a>
+        }
     </div>
-}
-@if (User.IsInRole("HRAdmin"))
-{
-    <p>
-        <a asp-action="ManageProfileCompleteness" class="btn btn-info">📊 Manage Profile Completeness</a>
-    </p>
-}
-<p>
-    <a asp-controller="Employees" asp-action="Create" class="btn btn-primary">Create Employee Record</a>
-    @if (User.IsInRole("SystemAdmin"))
-    {
-        <a asp-controller="Account" asp-action="CreateEmployeeAccount" class="btn btn-success">➕ Create Employee Account</a>
-    }
-    @if (User.IsInRole("LineManager"))
-    {
-        <a asp-action="MyTeam" class="btn btn-info">👥 My Team</a>
-    }
-</p>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Employee Code</th>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Department</th>
-            <th>Position</th>
-            <th>Contract</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.EmployeeCode</td>
-                    <td>@item.FullName</td>
-                    <td>@item.Email</td>
-                    <td>@item.Phone</td>
-                    <td>@item.Department?.DepartmentName</td>
-                    <td>@item.Position?.PositionTitle</td>
-                    <td>@item.Contract?.ContractType</td>
-                    <td class="text-nowrap">
-                        <div class="btn-group" role="group">
-                            @if (User.IsInRole("HRAdmin"))
-                            {
-                                <a asp-controller="Employees" asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-warning btn-sm">Edit</a>
-                            }
-                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeId" class="btn btn-info btn-sm">Details</a>
-                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-danger btn-sm">Delete</a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="8">No employees found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="dt-controls px-4 pt-4 pb-2">
+            <div class="dt-search">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" placeholder="Search employees…"
+                       data-dt-search="employeesTable" data-dt-pagesize="15" />
+            </div>
+            <span class="fs-12 text-muted-custom" data-dt-info="employeesTable"></span>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table" id="employeesTable">
+                <thead>
+                    <tr>
+                        <th data-sort>Code</th>
+                        <th data-sort>Name</th>
+                        <th data-sort>Email</th>
+                        <th>Phone</th>
+                        <th data-sort>Department</th>
+                        <th data-sort>Position</th>
+                        <th>Contract</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-600 text-accent">@item.EmployeeCode</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width:30px;height:30px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">
+                                            @(string.Concat((item.FullName ?? "?").Split(' ').Take(2).Select(w => char.ToUpper(w[0]))))
+                                        </div>
+                                        <span class="fw-600">@item.FullName</span>
+                                    </div>
+                                </td>
+                                <td class="text-muted-custom">@item.Email</td>
+                                <td class="text-muted-custom">@(item.Phone ?? "—")</td>
+                                <td>@(item.Department?.DepartmentName ?? "—")</td>
+                                <td>@(item.Position?.PositionTitle ?? "—")</td>
+                                <td>
+                                    @if (item.Contract != null)
+                                    {
+                                        <span class="pill pill-active">@item.Contract.ContractType</span>
+                                    }
+                                    else { <span class="text-muted-custom">—</span> }
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a asp-action="Details" asp-route-id="@item.EmployeeId"
+                                           class="btn btn-sm btn-outline-secondary">Details</a>
+                                        @if (User.IsInRole("HRAdmin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.EmployeeId"
+                                               class="btn btn-sm btn-outline-primary">Edit</a>
+                                        }
+                                        @if (User.IsInRole("SystemAdmin"))
+                                        {
+                                            <a asp-action="Delete" asp-route-id="@item.EmployeeId"
+                                               class="btn btn-sm btn-outline-danger">Delete</a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted-custom">No employees found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dt-pagination px-4 pb-3">
+            <span class="fs-12 text-muted-custom" data-dt-info="employeesTable"></span>
+            <div class="dt-page-btns" data-dt-pages="employeesTable"></div>
+        </div>
+    </div>
+</div>

@@ -1,28 +1,38 @@
 @model IEnumerable<Milstone3_WebApp.Employee>
 @{
-    ViewData["Title"] = "Department view";
+    ViewData["Title"] = "Reassign employees";
 }
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">@ViewBag.DepartmentName</h1>
-        <p class="page-subtitle">@Model.Count() member@(Model.Count() == 1 ? "" : "s") in this department</p>
+        <h1 class="page-title">Reassign employees</h1>
+        <p class="page-subtitle">Choose an employee to move to a different department or manager</p>
     </div>
-    <a asp-action="DepartmentView" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left me-1"></i>All departments
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-diagram-3 me-1"></i>Full hierarchy
     </a>
 </div>
 
 <div class="card">
     <div class="card-body p-0">
+        <div class="dt-controls px-4 pt-4 pb-2">
+            <div class="dt-search">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" placeholder="Search employees…"
+                       data-dt-search="reassignTable" data-dt-pagesize="15" />
+            </div>
+            <span class="fs-12 text-muted-custom" data-dt-info="reassignTable"></span>
+        </div>
+
         <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table" id="reassignTable">
                 <thead>
                     <tr>
                         <th data-sort>Employee</th>
                         <th data-sort>Position</th>
+                        <th data-sort>Department</th>
                         <th data-sort>Manager</th>
-                        <th>Actions</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,19 +48,27 @@
                                 </div>
                             </td>
                             <td class="text-muted-custom">@(emp.Position?.PositionTitle ?? "—")</td>
+                            <td>@(emp.Department?.DepartmentName ?? "—")</td>
                             <td class="text-muted-custom">@(emp.Manager?.FullName ?? "—")</td>
                             <td>
                                 <a asp-action="Reassign" asp-route-id="@emp.EmployeeId"
-                                   class="btn btn-sm btn-outline-primary">Reassign</a>
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-arrow-left-right me-1"></i>Reassign
+                                </a>
                             </td>
                         </tr>
                     }
                     @if (!Model.Any())
                     {
-                        <tr><td colspan="4" class="text-center py-4 text-muted-custom">No employees in this department.</td></tr>
+                        <tr><td colspan="5" class="text-center py-4 text-muted-custom">No employees found.</td></tr>
                     }
                 </tbody>
             </table>
+        </div>
+
+        <div class="dt-pagination px-4 pb-3">
+            <span class="fs-12 text-muted-custom" data-dt-info="reassignTable"></span>
+            <div class="dt-page-btns" data-dt-pages="reassignTable"></div>
         </div>
     </div>
 </div>

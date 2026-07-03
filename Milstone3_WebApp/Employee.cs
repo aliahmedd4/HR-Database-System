@@ -73,6 +73,8 @@ public partial class Employee
 
     public DateTime? UpdatedAt { get; set; }
 
+    public string? PasswordHash { get; set; }
+
     public virtual ICollection<AllowanceDeduction> AllowanceDeductions { get; set; } = new List<AllowanceDeduction>();
 
     public virtual ICollection<AttendanceCorrectionRequest> AttendanceCorrectionRequests { get; set; } = new List<AttendanceCorrectionRequest>();

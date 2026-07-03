@@ -1,40 +1,103 @@
-﻿@model IEnumerable<Milstone3_WebApp.Payroll>
-
+@model IEnumerable<Milstone3_WebApp.Payroll>
 @{
     ViewData["Title"] = "Payrolls";
 }
 
-<div class="welcome-banner">
-    <h2>Payrolls</h2>
-    <p>Browse all payroll records in the HRMS system. Use the button below to add new ones.</p>
-    <a asp-action="Create" class="btn btn-primary">➕ Create New Payroll</a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Payrolls</h1>
+        <p class="page-subtitle">@Model.Count() payroll record(s)</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="MonthlySummary" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-bar-chart me-1"></i>Monthly summary
+        </a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus me-1"></i>Generate payroll
+        </a>
+    </div>
 </div>
 
-<div class="card-grid">
-    @foreach (var payroll in Model)
-    {
-        <div class="card">
-            <h3>Payroll ID: @payroll.PeriodId</h3>
-            <p><strong>Employee:</strong> @payroll.Employee?.EmployeeId</p>
-            <p>💰 Net Salary: @payroll.NetSalary</p>
-            <p>💵 Gross Salary: @payroll.GrossSalary</p>
-            <p>📊 Base Amount: @payroll.BaseAmount</p>
-            <p>📈 Actual Pay: @payroll.ActualPay</p>
-            <p>📅 Period: @payroll.PeriodStart?.ToShortDateString() - @payroll.PeriodEnd?.ToShortDateString()</p>
-            <p>⚖️ Taxes: @payroll.Taxes</p>
-            <p>➕ Allowances: @payroll.TotalAllowances</p>
-            <p>➖ Deductions: @payroll.TotalDeductions</p>
-            <p>⏳ Payment Date: @payroll.PaymentDate?.ToShortDateString()</p>
-            <p>⏱ Hours Worked: @payroll.HoursWorked | Overtime: @payroll.OvertimeHours</p>
-            <p>📌 Status: @payroll.Status</p>
-            <p>🕒 Created At: @payroll.CreatedAt</p>
-            <p>💱 Currency: @payroll.Currency?.CurrencyId</p>
-
-            <div class="form-actions">
-                <a asp-action="Details" asp-route-id="@payroll.PayrollId" class="btn btn-secondary">View</a>
-                <a asp-action="Edit" asp-route-id="@payroll.PayrollId" class="btn btn-primary">Edit</a>
-                <a asp-action="Delete" asp-route-id="@payroll.PayrollId" class="btn btn-danger">Delete</a>
+<div class="card">
+    <div class="card-body p-0">
+        <div class="dt-controls px-4 pt-4 pb-2">
+            <div class="dt-search">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" placeholder="Search payrolls…"
+                       data-dt-search="payrollTable" data-dt-pagesize="15" />
             </div>
+            <span class="fs-12 text-muted-custom" data-dt-info="payrollTable"></span>
         </div>
-    }
+
+        <div class="admin-table-wrap">
+            <table class="admin-table" id="payrollTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th data-sort>Employee</th>
+                        <th data-sort>Period</th>
+                        <th>Gross salary</th>
+                        <th>Deductions</th>
+                        <th>Taxes</th>
+                        <th>Net salary</th>
+                        <th>Payment date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var p in Model)
+                        {
+                            var sc = (p.Status?.ToLower()) switch {
+                                "paid"      => "pill-approved",
+                                "pending"   => "pill-pending",
+                                "cancelled" => "pill-rejected",
+                                _           => "pill-inactive"
+                            };
+                            <tr>
+                                <td class="text-muted-custom">#@p.PayrollId</td>
+                                <td class="fw-600">@(p.Employee?.FullName ?? $"Emp #{p.Employee?.EmployeeId}")</td>
+                                <td>
+                                    @(p.PeriodStart?.ToString("dd MMM") ?? "—")
+                                    @if (p.PeriodEnd.HasValue) { <text> – @p.PeriodEnd.Value.ToString("dd MMM yyyy")</text> }
+                                </td>
+                                <td>@p.GrossSalary.ToString("N2")</td>
+                                <td>@(p.TotalDeductions?.ToString("N2") ?? "—")</td>
+                                <td>@(p.Taxes?.ToString("N2") ?? "—")</td>
+                                <td class="fw-600 text-accent">@(p.NetSalary?.ToString("N2") ?? "—")</td>
+                                <td class="text-muted-custom">@(p.PaymentDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                                <td><span class="pill @sc">@(p.Status ?? "—")</span></td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a asp-action="Details" asp-route-id="@p.PayrollId"
+                                           class="btn btn-sm btn-outline-secondary">View</a>
+                                        <a asp-action="Edit" asp-route-id="@p.PayrollId"
+                                           class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@p.PayrollId"
+                                           class="btn btn-sm btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center py-4 text-muted-custom">
+                                No payroll records found.
+                                <a asp-action="Create" class="ms-2">Generate first payroll</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dt-pagination px-4 pb-3">
+            <span class="fs-12 text-muted-custom" data-dt-info="payrollTable"></span>
+            <div class="dt-page-btns" data-dt-pages="payrollTable"></div>
+        </div>
+    </div>
 </div>

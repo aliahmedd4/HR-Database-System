@@ -1,140 +1,103 @@
-﻿@model IEnumerable<Milstone3_WebApp.Mission>
+@model IEnumerable<Milstone3_WebApp.Mission>
 @{
-    ViewData["Title"] = "My Missions";
+    ViewData["Title"] = "My missions";
 }
 
-<div class="welcome-banner mb-4">
-    <h2>My Missions</h2>
-    <p>View all missions assigned to you, @ViewBag.EmployeeName</p>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My missions</h1>
+        <p class="page-subtitle">
+            @if (!string.IsNullOrEmpty(ViewBag.EmployeeName as string))
+            {
+                <text>Assigned to @ViewBag.EmployeeName</text>
+            }
+        </p>
+    </div>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">
-        <h4>No Missions Assigned</h4>
-        <p>You don't have any missions assigned to you at the moment.</p>
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-briefcase" style="font-size:40px;color:var(--text-muted);display:block;margin-bottom:12px;"></i>
+            <div class="fw-600 fs-13" style="color:var(--text-secondary);">No missions assigned yet</div>
+            <div class="fs-12 text-muted-custom">You'll see your missions here once a manager assigns one.</div>
+        </div>
     </div>
 }
 else
 {
-    <div class="row">
-        @foreach (var mission in Model)
+    <div class="row g-3">
+        @foreach (var m in Model)
         {
-            var duration = mission.EndDate.HasValue && mission.StartDate != null
-            ? mission.EndDate.Value.DayNumber - mission.StartDate.DayNumber + 1
-            : 0;
+            var duration = m.EndDate.HasValue
+                ? m.EndDate.Value.DayNumber - m.StartDate.DayNumber + 1 : 0;
 
-            // Determine card border color based on status
-            var statusClass = mission.Status switch
-            {
-                "Completed" => "border-success",
-                "InProgress" => "border-primary",
-                "Assigned" => "border-warning",
-                "Cancelled" => "border-danger",
-                _ => "border-secondary"
+            var accentColor = m.Status switch {
+                "Completed"  => "var(--success)",
+                "InProgress" => "var(--accent)",
+                "Assigned"   => "var(--warning)",
+                "Cancelled"  => "var(--danger)",
+                _            => "var(--text-muted)"
+            };
+            var pillClass = m.Status switch {
+                "Completed"  => "pill-approved",
+                "InProgress" => "pill-onleave",
+                "Assigned"   => "pill-pending",
+                "Cancelled"  => "pill-rejected",
+                _            => "pill-inactive"
             };
 
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-sm h-100 @statusClass" style="border-width: 3px;">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">@mission.MissionName</h5>
-                        @if (mission.Status == "Completed")
-                        {
-                            <span class="badge bg-success">✓ Completed</span>
-                        }
-                        else if (mission.Status == "InProgress")
-                        {
-                            <span class="badge bg-primary">⚡ In Progress</span>
-                        }
-                        else if (mission.Status == "Assigned")
-                        {
-                            <span class="badge bg-warning text-dark">📋 Assigned</span>
-                        }
-                        else if (mission.Status == "Cancelled")
-                        {
-                            <span class="badge bg-danger">✗ Cancelled</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">@mission.Status</span>
-                        }
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100" style="border-top:3px solid @accentColor;">
+                    <div class="card-header">
+                        <span class="card-title">@m.MissionName</span>
+                        <span class="pill @pillClass">@m.Status</span>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <strong>📍 Destination:</strong> @mission.Destination<br>
-                            <strong>🌍 Location:</strong> @mission.Location
-                        </div>
-
-                        <div class="mb-3">
-                            <strong>📅 Start Date:</strong>
-                            @(mission.StartDate.ToString("O")[..10])<br>
-                            <strong>📅 End Date:</strong>
-                            @(mission.EndDate.HasValue? mission.EndDate.Value.ToString("O")[..10] : "Not set")<br>
-                            <strong>⏱️ Duration:</strong> @duration days
-                        </div>
-
-                        @if (mission.Manager != null)
-                        {
-                            <div class="mb-2">
-                                <strong>👤 Manager:</strong> @mission.Manager.FullName
-                            </div>
-                        }
-
-                        @if (mission.AssignedByNavigation != null)
-                        {
-                            <div class="mb-2">
-                                <small class="text-muted">
-                                    Assigned by: @mission.AssignedByNavigation.FullName
-                                </small>
-                            </div>
-                        }
-
-                        @if (mission.CompletedAt != null)
-                        {
-                            <div class="alert alert-success mt-3 mb-0 py-2">
-                                <small>
-                                    <strong>✓ Completed:</strong>
-                                    @mission.CompletedAt?.ToString("yyyy-MM-dd HH:mm")
-                                </small>
-                            </div>
-                        }
+                        <dl style="display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13px;margin:0;">
+                            @if (!string.IsNullOrEmpty(m.Destination))
+                            {
+                                <dt class="text-muted-custom">Destination</dt>
+                                <dd class="mb-0">@m.Destination</dd>
+                            }
+                            @if (!string.IsNullOrEmpty(m.Location))
+                            {
+                                <dt class="text-muted-custom">Location</dt>
+                                <dd class="mb-0">@m.Location</dd>
+                            }
+                            <dt class="text-muted-custom">Start</dt>
+                            <dd class="mb-0">@m.StartDate.ToString("dd MMM yyyy")</dd>
+                            <dt class="text-muted-custom">End</dt>
+                            <dd class="mb-0">@(m.EndDate?.ToString("dd MMM yyyy") ?? "—")</dd>
+                            @if (duration > 0)
+                            {
+                                <dt class="text-muted-custom">Duration</dt>
+                                <dd class="mb-0">@duration day(s)</dd>
+                            }
+                            @if (m.Manager != null)
+                            {
+                                <dt class="text-muted-custom">Manager</dt>
+                                <dd class="mb-0">@m.Manager.FullName</dd>
+                            }
+                            @if (m.AssignedByNavigation != null)
+                            {
+                                <dt class="text-muted-custom">Assigned by</dt>
+                                <dd class="mb-0">@m.AssignedByNavigation.FullName</dd>
+                            }
+                            @if (m.CompletedAt != null)
+                            {
+                                <dt class="text-muted-custom">Completed</dt>
+                                <dd class="mb-0" style="color:var(--success);">@m.CompletedAt?.ToString("dd MMM yyyy HH:mm")</dd>
+                            }
+                        </dl>
                     </div>
-                    <div class="card-footer">
-                        <a asp-action="Details" asp-route-id="@mission.MissionId" class="btn btn-info btn-sm w-100">
-                            <i class="bi bi-eye"></i> View Details
-                        </a>
+                    <div class="card-body pt-0">
+                        <a asp-action="Details" asp-route-id="@m.MissionId"
+                           class="btn btn-sm btn-outline-secondary w-100">View details</a>
                     </div>
                 </div>
             </div>
         }
     </div>
 }
-
-<div class="mt-4">
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
-        ← Back to Dashboard
-    </a>
-</div>
-
-<style>
-    .welcome-banner {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .welcome-banner h2 {
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-
-    .card {
-        transition: transform 0.2s;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-    }
-</style>

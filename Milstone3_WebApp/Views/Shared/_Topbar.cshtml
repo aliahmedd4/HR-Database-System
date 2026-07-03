@@ -1,0 +1,72 @@
+@using System.Security.Claims
+@{
+    var userName  = User.Identity?.Name ?? "User";
+    var userRole  = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var initials  = string.Concat(userName.Split(' ')
+                        .Where(w => w.Length > 0)
+                        .Take(2)
+                        .Select(w => char.ToUpper(w[0])));
+    if (string.IsNullOrEmpty(initials)) initials = "U";
+    var unreadCount = (int)(ViewBag.UnreadNotifications ?? 0);
+}
+
+<header class="admin-topbar">
+
+    <!-- Sidebar toggle -->
+    <button class="topbar-toggle" aria-label="Toggle sidebar">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Global search -->
+    <div class="topbar-search">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" id="globalSearch" placeholder="Search…" autocomplete="off" />
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="topbar-actions">
+
+        <!-- Notification bell -->
+        <a class="topbar-icon-btn" asp-controller="Notifications" asp-action="MyNotifications" title="Notifications">
+            <i class="bi bi-bell"></i>
+            @if (unreadCount > 0)
+            {
+                <span class="notif-badge">@(unreadCount > 99 ? "99+" : unreadCount.ToString())</span>
+            }
+        </a>
+
+        <div class="topbar-divider"></div>
+
+        <!-- User menu -->
+        <div class="dropdown">
+            <button class="user-menu-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-avatar">@initials</div>
+                <div class="user-info">
+                    <div class="user-name">@userName</div>
+                    <div class="user-role-label">@userRole</div>
+                </div>
+                <i class="bi bi-chevron-down ms-1" style="font-size:11px;color:var(--text-muted)"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" style="min-width:180px;border-radius:10px;border-color:var(--border);font-size:13px;">
+                <li>
+                    <a class="dropdown-item" asp-controller="Employees" asp-action="EditMyProfile">
+                        <i class="bi bi-person me-2"></i>My profile
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-controller="Notifications" asp-action="MyNotifications">
+                        <i class="bi bi-bell me-2"></i>Notifications
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                        <i class="bi bi-box-arrow-left me-2"></i>Log out
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</header>

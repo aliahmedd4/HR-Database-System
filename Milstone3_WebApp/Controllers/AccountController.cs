@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using Milstone3_WebApp;
 
 namespace Milstone3_WebApp.Controllers
@@ -17,6 +18,32 @@ namespace Milstone3_WebApp.Controllers
             _context = context;
         }
 
+        private static string HashPassword(string password)
+        {
+            byte[] salt = RandomNumberGenerator.GetBytes(16);
+            byte[] hash = Rfc2898DeriveBytes.Pbkdf2(
+                password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+            return Convert.ToBase64String(salt) + ":" + Convert.ToBase64String(hash);
+        }
+
+        private static bool VerifyPassword(string password, string storedHash)
+        {
+            var parts = storedHash.Split(':');
+            if (parts.Length != 2) return false;
+            try
+            {
+                byte[] salt = Convert.FromBase64String(parts[0]);
+                byte[] expectedHash = Convert.FromBase64String(parts[1]);
+                byte[] actualHash = Rfc2898DeriveBytes.Pbkdf2(
+                    password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+                return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         // GET: Account/Login
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
@@ -28,38 +55,42 @@ namespace Milstone3_WebApp.Controllers
         // POST: Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string email, string password, string role, string returnUrl = null)
+        public async Task<IActionResult> Login(string email, string password, string returnUrl = null)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(role))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                ViewBag.Error = "Please enter email, password, and select a role.";
+                ViewBag.Error = "Please enter your email and password.";
                 return View();
             }
 
-            // Role-specific passwords
-            string expectedPassword = role switch
-            {
-                "SystemAdmin" => "systemadmin123",
-                "HRAdmin" => "admin123",
-                "LineManager" => "manager123",
-                "Employee" => "employee123",
-                _ => ""
-            };
-
-            if (password != expectedPassword)
-            {
-                ViewBag.Error = $"Invalid password for selected role.";
-                return View();
-            }
-
-            // Find employee by email
+            // Find employee by email including their assigned roles
             var employee = await _context.Employees
                 .Include(e => e.Position)
+                .Include(e => e.EmployeeRoles)
+                    .ThenInclude(er => er.Role)
                 .FirstOrDefaultAsync(e => e.Email == email && e.IsActive == true);
 
             if (employee == null)
             {
-                ViewBag.Error = "Email not found. Please create an account first.";
+                ViewBag.Error = "Email not found or account is inactive.";
+                return View();
+            }
+
+            // Verify per-user password hash
+            if (string.IsNullOrEmpty(employee.PasswordHash) || !VerifyPassword(password, employee.PasswordHash))
+            {
+                ViewBag.Error = "Invalid password.";
+                return View();
+            }
+
+            // Auto-detect role: pick the most privileged active role
+            var rolePriority = new[] { "SystemAdmin", "HRAdmin", "LineManager", "Employee" };
+            var role = rolePriority.FirstOrDefault(r =>
+                employee.EmployeeRoles.Any(er => er.IsActive == true && er.Role?.RoleName == r));
+
+            if (role == null)
+            {
+                ViewBag.Error = "No active role assigned to your account. Contact your administrator.";
                 return View();
             }
 
@@ -84,12 +115,10 @@ namespace Milstone3_WebApp.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
-            TempData["SuccessMessage"] = $"Welcome back, {employee.FullName} ({role})!";
+            TempData["SuccessMessage"] = $"Welcome back, {employee.FullName}!";
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
                 return Redirect(returnUrl);
-            }
             return RedirectToAction("Index", "Home");
         }
 
@@ -107,12 +136,24 @@ namespace Milstone3_WebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "SystemAdmin,HRAdmin,LineManager")]
-        public async Task<IActionResult> Register(string firstName, string lastName, string email, string phone, string role)
+        public async Task<IActionResult> Register(string firstName, string lastName, string email, string phone, string role, string password, string confirmPassword)
         {
             if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName) ||
-                string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role))
+                string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role) || string.IsNullOrEmpty(password))
             {
                 ViewBag.Error = "Please fill in all required fields.";
+                return View();
+            }
+
+            if (password != confirmPassword)
+            {
+                ViewBag.Error = "Passwords do not match.";
+                return View();
+            }
+
+            if (password.Length < 8)
+            {
+                ViewBag.Error = "Password must be at least 8 characters.";
                 return View();
             }
 
@@ -126,24 +167,16 @@ namespace Milstone3_WebApp.Controllers
                 return View();
             }
 
-            // Generate employee code
-            var lastEmployee = await _context.Employees
-                .OrderByDescending(e => e.EmployeeId)
-                .FirstOrDefaultAsync();
-
-            int nextId = (lastEmployee?.EmployeeId ?? 0) + 1;
-            string employeeCode = $"EMP{nextId:D3}";
-
-            // Create new employee
+            // Insert with a temporary unique code; replace with the DB-assigned ID after insert
             var newEmployee = new Employee
             {
-                EmployeeCode = employeeCode,
+                EmployeeCode = $"TEMP-{Guid.NewGuid():N}",
                 FirstName = firstName,
                 LastName = lastName,
                 FullName = $"{firstName} {lastName}",
                 Email = email,
                 Phone = phone,
-                NationalId = $"NID{nextId:D6}", // Add this line - generates unique national_id
+                NationalId = $"TEMPNID-{Guid.NewGuid():N}",
                 HireDate = DateOnly.FromDateTime(DateTime.Now),
                 IsActive = true,
                 ProfileCompletion = false,
@@ -152,10 +185,16 @@ namespace Milstone3_WebApp.Controllers
                 PayGradeId = 1,
                 SalaryTypeId = 1,
                 CurrencyId = 1,
-                BaseSalary = 50000.00m
+                BaseSalary = 50000.00m,
+                PasswordHash = HashPassword(password)
             };
 
             _context.Employees.Add(newEmployee);
+            await _context.SaveChangesAsync();
+
+            // Now assign the real code using the DB-generated ID (race-condition-free)
+            newEmployee.EmployeeCode = $"EMP{newEmployee.EmployeeId:D3}";
+            newEmployee.NationalId = $"NID{newEmployee.EmployeeId:D6}";
             await _context.SaveChangesAsync();
 
             // Assign role - look up role by name
@@ -194,6 +233,83 @@ namespace Milstone3_WebApp.Controllers
             }
 
             TempData["SuccessMessage"] = "Account created successfully! You can now login.";
+            return RedirectToAction("Login");
+        }
+
+        // ── First-run setup ──────────────────────────────────────────────
+        // GET /Account/Setup — only accessible when NO employee has a password hash.
+        // Use this once to create the initial SystemAdmin account, then it locks itself.
+        [HttpGet]
+        public async Task<IActionResult> Setup()
+        {
+            bool anyPasswordSet = await _context.Employees
+                .AnyAsync(e => e.PasswordHash != null);
+            if (anyPasswordSet)
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Setup(string email, string password, string confirmPassword)
+        {
+            bool anyPasswordSet = await _context.Employees
+                .AnyAsync(e => e.PasswordHash != null);
+            if (anyPasswordSet)
+                return RedirectToAction("Login");
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ViewBag.Error = "Email and password are required.";
+                return View();
+            }
+            if (password != confirmPassword)
+            {
+                ViewBag.Error = "Passwords do not match.";
+                return View();
+            }
+            if (password.Length < 8)
+            {
+                ViewBag.Error = "Password must be at least 8 characters.";
+                return View();
+            }
+
+            // Find or create the SystemAdmin account
+            var employee = await _context.Employees
+                .Include(e => e.EmployeeRoles)
+                .FirstOrDefaultAsync(e => e.Email == email);
+
+            if (employee == null)
+            {
+                ViewBag.Error = "No employee found with that email. Add the employee to the database first, then run setup.";
+                return View();
+            }
+
+            employee.PasswordHash = HashPassword(password);
+            await _context.SaveChangesAsync();
+
+            // Ensure a SystemAdmin role is assigned
+            var adminRole = await _context.Roles
+                .FirstOrDefaultAsync(r => r.RoleName == "SystemAdmin");
+            if (adminRole != null)
+            {
+                bool hasAdminRole = employee.EmployeeRoles
+                    .Any(er => er.RoleId == adminRole.RoleId && er.IsActive == true);
+                if (!hasAdminRole)
+                {
+                    _context.EmployeeRoles.Add(new EmployeeRole
+                    {
+                        EmployeeId = employee.EmployeeId,
+                        RoleId    = adminRole.RoleId,
+                        IsActive  = true,
+                        AssignedDate = DateTime.Now
+                    });
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            TempData["SuccessMessage"] = $"Setup complete. You can now sign in as {email}.";
             return RedirectToAction("Login");
         }
 
@@ -241,12 +357,19 @@ namespace Milstone3_WebApp.Controllers
             string nationalId, DateOnly? dateOfBirth, string countryOfBirth,
             int? departmentId, int? positionId, int? managerId, int? contractId,
             decimal? baseSalary, string address, string emergencyContactName,
-            string emergencyContactPhone, string relationship)
+            string emergencyContactPhone, string relationship, string password)
         {
             if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName) ||
-                string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role))
+                string.IsNullOrEmpty(email) || string.IsNullOrEmpty(role) || string.IsNullOrEmpty(password))
             {
-                ViewBag.Error = "Please fill in all required fields (First Name, Last Name, Email, Role).";
+                ViewBag.Error = "Please fill in all required fields (First Name, Last Name, Email, Role, Password).";
+                RepopulateDropdowns();
+                return View();
+            }
+
+            if (password.Length < 8)
+            {
+                ViewBag.Error = "Password must be at least 8 characters.";
                 RepopulateDropdowns();
                 return View();
             }
@@ -262,24 +385,16 @@ namespace Milstone3_WebApp.Controllers
                 return View();
             }
 
-            // Generate employee code
-            var lastEmployee = await _context.Employees
-                .OrderByDescending(e => e.EmployeeId)
-                .FirstOrDefaultAsync();
-
-            int nextId = (lastEmployee?.EmployeeId ?? 0) + 1;
-            string employeeCode = $"EMP{nextId:D3}";
-
-            // Create new employee with all provided details
+            // Insert with a temporary unique code; replace with the DB-assigned ID after insert
             var newEmployee = new Employee
             {
-                EmployeeCode = employeeCode,
+                EmployeeCode = $"TEMP-{Guid.NewGuid():N}",
                 FirstName = firstName,
                 LastName = lastName,
                 FullName = $"{firstName} {lastName}",
                 Email = email,
                 Phone = phone,
-                NationalId = nationalId ?? $"NID{nextId:D6}",
+                NationalId = !string.IsNullOrEmpty(nationalId) ? nationalId : $"TEMPNID-{Guid.NewGuid():N}",
                 DateOfBirth = dateOfBirth,
                 CountryOfBirth = countryOfBirth,
                 HireDate = DateOnly.FromDateTime(DateTime.Now),
@@ -296,12 +411,19 @@ namespace Milstone3_WebApp.Controllers
                 ProfileCompletion = false,
                 AccountStatus = "Active",
                 EmploymentStatus = "Active",
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                PasswordHash = HashPassword(password)
             };
 
             try
             {
                 _context.Employees.Add(newEmployee);
+                await _context.SaveChangesAsync();
+
+                // Assign the real code using the DB-generated ID (race-condition-free)
+                newEmployee.EmployeeCode = $"EMP{newEmployee.EmployeeId:D3}";
+                if (string.IsNullOrEmpty(nationalId))
+                    newEmployee.NationalId = $"NID{newEmployee.EmployeeId:D6}";
                 await _context.SaveChangesAsync();
 
                 // Assign role - look up role by name

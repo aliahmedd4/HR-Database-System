@@ -1,55 +1,97 @@
-﻿@model IEnumerable<Milstone3_WebApp.Employee>
-
+@model IEnumerable<Milstone3_WebApp.Employee>
 @{
-    ViewData["Title"] = "Organizational Hierarchy";
+    ViewData["Title"] = "Org hierarchy";
 }
 
-<div class="welcome-banner mb-4">
-    <h2>Organizational Hierarchy</h2>
-    <p>Browse employees by department and reporting structure</p>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Org hierarchy</h1>
+        <p class="page-subtitle">Browse employees by department and reporting structure</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="DepartmentView" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-building me-1"></i>By department
+        </a>
+        <a asp-action="TeamView" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-diagram-3 me-1"></i>Team view
+        </a>
+    </div>
 </div>
 
-<!-- Search + Filter -->
-<div class="mb-3 d-flex justify-content-between">
-    <form asp-action="Index" method="get" class="d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Search employees..." />
-        <select name="department" class="form-select me-2">
-            <option value="">All Departments</option>
-            @if (ViewBag.Departments != null)
-            {
-                foreach (var dept in ViewBag.Departments)
-                {
-                    <option value="@dept.DepartmentId">@dept.DepartmentName</option>
-                }
-            }
-        </select>
-        <button type="submit" class="btn btn-primary">Filter</button>
-    </form>
+<!-- Search & filter -->
+<div class="card mb-3">
+    <div class="card-body" style="padding:12px 18px!important;">
+        <form asp-action="Index" method="get" class="d-flex flex-wrap gap-3 align-items-end">
+            <div class="dt-search">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="search" placeholder="Search employees…"
+                       value="@Context.Request.Query["search"]" style="width:220px;" />
+            </div>
+            <div>
+                <select name="department" class="form-select" style="width:180px;">
+                    <option value="">All departments</option>
+                    @if (ViewBag.Departments != null)
+                    {
+                        foreach (var dept in ViewBag.Departments)
+                        {
+                            <option value="@dept.DepartmentId">@dept.DepartmentName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Clear</a>
+        </form>
+    </div>
 </div>
 
-<!-- Employee Table -->
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Employee</th>
-            <th>Position</th>
-            <th>Department</th>
-            <th>Manager</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var emp in Model)
-        {
-            <tr>
-                <td>@emp.FullName</td>
-                <td>@emp.Position</td>
-                <td>@emp.Department?.DepartmentName</td>
-                <td>@emp.Manager?.FullName</td>
-                <td>
-                    <a asp-action="Reassign" asp-route-id="@emp.EmployeeId" class="btn btn-sm btn-warning">Reassign</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card">
+    <div class="card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table" id="hierarchyTable">
+                <thead>
+                    <tr>
+                        <th data-sort>Employee</th>
+                        <th data-sort>Position</th>
+                        <th data-sort>Department</th>
+                        <th data-sort>Manager</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var emp in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-light);
+                                                color:var(--accent);display:flex;align-items:center;justify-content:center;
+                                                font-size:10px;font-weight:700;flex-shrink:0;">
+                                        @(string.Concat((emp.FullName ?? "?").Split(' ').Take(2).Select(w => char.ToUpper(w[0]))))
+                                    </div>
+                                    <span class="fw-600">@emp.FullName</span>
+                                </div>
+                            </td>
+                            <td class="text-muted-custom">@(emp.Position?.PositionTitle ?? "—")</td>
+                            <td>@(emp.Department?.DepartmentName ?? "—")</td>
+                            <td class="text-muted-custom">@(emp.Manager?.FullName ?? "—")</td>
+                            <td>
+                                <a asp-action="Reassign" asp-route-id="@emp.EmployeeId"
+                                   class="btn btn-sm btn-outline-secondary">Reassign</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted-custom">No employees found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="dt-pagination px-4 pb-3">
+            <span class="fs-12 text-muted-custom">@Model.Count() employee(s)</span>
+        </div>
+    </div>
+</div>

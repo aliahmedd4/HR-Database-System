@@ -811,6 +811,7 @@ public partial class HrPayrollSystemContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("updated_at");
+            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
 
             entity.HasOne(d => d.Contract).WithMany(p => p.Employees)
                 .HasForeignKey(d => d.ContractId)

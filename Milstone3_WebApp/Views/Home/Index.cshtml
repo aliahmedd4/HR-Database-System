@@ -1,188 +1,316 @@
-﻿@model IEnumerable<Milstone3_WebApp.Notification>
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Dashboard";
+    var role    = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var name    = User.Identity?.Name ?? "User";
+    bool isSA   = role == "SystemAdmin";
+    bool isHRA  = role == "HRAdmin";
+    bool isLM   = role == "LineManager";
+    bool isEmp  = role == "Employee";
+    bool isAdmin = isSA || isHRA;
+    bool isMgr   = isSA || isHRA || isLM;
+
+    // Stats from ViewBag (populated by HomeController)
+    int totalEmployees    = (int)(ViewBag.TotalEmployees    ?? 0);
+    int presentToday      = (int)(ViewBag.PresentToday      ?? 0);
+    int onLeaveToday      = (int)(ViewBag.OnLeaveToday      ?? 0);
+    int pendingLeaves     = (int)(ViewBag.PendingLeaves     ?? 0);
+    int expiringContracts = (int)(ViewBag.ExpiringContracts ?? 0);
+    int pendingMissions   = (int)(ViewBag.PendingMissions   ?? 0);
+    int myLeaveBalance    = (int)(ViewBag.MyLeaveBalance    ?? 0);
+    int myMissions        = (int)(ViewBag.MyMissions        ?? 0);
+    int unreadNotifs      = (int)(ViewBag.UnreadNotifications ?? 0);
 }
 
-<div class="welcome-banner text-center mb-4 position-relative">
-    <div class="position-absolute top-0 end-0 mt-3 me-3">
-        <a asp-controller="Account" asp-action="Logout" class="btn btn-danger btn-sm">
-            🚪 Logout
-        </a>
-    </div>
-    <h1 class="display-4">Welcome to Milstone3 HRMS Portal</h1>
-    <p class="lead">Manage employees, attendance, shifts, leaves, missions, payrolls, notifications, analytics & hierarchy in one place.</p>
-</div>
-
-<div class="row">
-    <!-- Employees -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Employees</h5>
-                <p class="card-text">Manage employee records and profiles.</p>
-                <a asp-controller="Employees" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Attendance -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Attendance</h5>
-                <p class="card-text">Record and track daily attendance.</p>
-                <a asp-controller="Attendance" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Shifts -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Shifts</h5>
-                <p class="card-text">Manage shift schedules and assignments.</p>
-                <a asp-controller="Shifts" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Leaves -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Leaves</h5>
-                <p class="card-text">Track leave requests and approvals.</p>
-                <a asp-controller="Leaves" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Missions -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Missions</h5>
-                <p class="card-text">Manage employee missions and assignments.</p>
-                <a asp-controller="Missions" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Payrolls -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Payrolls</h5>
-                <p class="card-text">View and process payroll records.</p>
-                <a asp-controller="Payrolls" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notifications -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Notifications</h5>
-                <p class="card-text">View and manage system alerts.</p>
-                <a asp-controller="Notifications" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Analytics -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Analytics</h5>
-                <p class="card-text">Department stats and compliance reports.</p>
-                <a asp-controller="Analytics" asp-action="DepartmentStats" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Hierarchy -->
-    <div class="col-md-4">
-        <div class="card shadow-sm mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Hierarchy</h5>
-                <p class="card-text">View and manage organizational hierarchy.</p>
-                <a asp-controller="Hierarchy" asp-action="Index" class="btn btn-primary">Go</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Recent Notifications Section -->
-<div class="mt-5">
-    <h3>Recent Notifications</h3>
-    <div class="row">
-        @foreach (var n in Model.Take(3))
-        {
-            <div class="col-md-4 mb-3">
-                @await Html.PartialAsync("_NotificationCard", n)
-            </div>
-        }
-    </div>
+<!-- Page header -->
+<div class="page-header">
     <div>
-        <a asp-controller="Notifications" asp-action="Index" class="btn btn-link">View All Notifications</a>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Welcome back, @name — @DateTime.Now.ToString("dddd, d MMMM yyyy")</p>
     </div>
 </div>
 
-<!-- Employees Table Section -->
-<div class="mt-5">
-    <h3>Employees</h3>
-    <p>
-        <a asp-controller="Employees" asp-action="Create" class="btn btn-primary">Create</a>
-    </p>
+<!-- ══════════════════════════════════
+     KPI STAT CARDS
+══════════════════════════════════ -->
+<div class="row g-3 mb-4">
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Employee Code</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Department</th>
-                <th>Position</th>
-                <th>Contract</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (ViewBag.Employees != null)
-            {
-                foreach (var item in (IEnumerable<Milstone3_WebApp.Employee>)ViewBag.Employees)
-                {
-                    <tr>
-                        <td>@item.EmployeeCode</td>
-                        <td>@item.FullName</td>
-                        <td>@item.Email</td>
-                        <td>@item.Phone</td>
-                        <td>@item.Department?.DepartmentName</td>
-                        <td>@item.Position?.PositionTitle</td>
-                        <td>@item.Contract?.ContractType</td>
-                        <td>
-                            <a asp-controller="Employees" asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-warning">Edit</a>
-                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@item.EmployeeId" class="btn btn-info btn-sm">Details</a>
-                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-danger">Delete</a>
-                        </td>
-                    </tr>
+    @if (isMgr)
+    {
+        <div class="col-6 col-md-3">
+            <div class="stat-card accent">
+                <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-label">Total employees</div>
+                <div class="stat-value">@totalEmployees</div>
+                <div class="stat-meta">Active headcount</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card success">
+                <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-label">Present today</div>
+                <div class="stat-value">@presentToday</div>
+                <div class="stat-meta">Checked in</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card warning">
+                <div class="stat-icon"><i class="bi bi-calendar-x"></i></div>
+                <div class="stat-label">On leave today</div>
+                <div class="stat-value">@onLeaveToday</div>
+                <div class="stat-meta">Active leave</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card danger">
+                <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-label">Pending approvals</div>
+                <div class="stat-value">@pendingLeaves</div>
+                <div class="stat-meta">Leave requests</div>
+            </div>
+        </div>
+    }
+
+    @if (isAdmin)
+    {
+        <div class="col-6 col-md-3">
+            <div class="stat-card warning">
+                <div class="stat-icon"><i class="bi bi-file-earmark-x"></i></div>
+                <div class="stat-label">Expiring contracts</div>
+                <div class="stat-value">@expiringContracts</div>
+                <div class="stat-meta">Within 30 days</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card accent">
+                <div class="stat-icon"><i class="bi bi-briefcase"></i></div>
+                <div class="stat-label">Pending missions</div>
+                <div class="stat-value">@pendingMissions</div>
+                <div class="stat-meta">Awaiting approval</div>
+            </div>
+        </div>
+    }
+
+    @if (isEmp)
+    {
+        <div class="col-6 col-md-3">
+            <div class="stat-card success">
+                <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-label">Leave balance</div>
+                <div class="stat-value">@myLeaveBalance</div>
+                <div class="stat-meta">Days remaining</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card accent">
+                <div class="stat-icon"><i class="bi bi-briefcase"></i></div>
+                <div class="stat-label">My missions</div>
+                <div class="stat-value">@myMissions</div>
+                <div class="stat-meta">Assigned to me</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card warning">
+                <div class="stat-icon"><i class="bi bi-bell"></i></div>
+                <div class="stat-label">Notifications</div>
+                <div class="stat-value">@unreadNotifs</div>
+                <div class="stat-meta">Unread</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card danger">
+                <div class="stat-icon"><i class="bi bi-hourglass"></i></div>
+                <div class="stat-label">Pending leaves</div>
+                <div class="stat-value">@pendingLeaves</div>
+                <div class="stat-meta">Awaiting approval</div>
+            </div>
+        </div>
+    }
+
+</div>
+
+<!-- ══════════════════════════════════
+     BOTTOM TWO-COLUMN AREA
+══════════════════════════════════ -->
+<div class="row g-3">
+
+    <!-- Left: Quick actions / Module links -->
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <span class="card-title">Quick actions</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" style="border-radius:0 0 12px 12px;">
+
+                    @if (isEmp || isMgr)
+                    {
+                        <a asp-controller="Attendance" asp-action="@(isEmp ? "Record" : "Index")"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-clock"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">@(isEmp ? "Record attendance" : "View attendance")</div>
+                                <div class="fs-12 text-muted-custom">@(isEmp ? "Check in or out for today" : "See today's attendance log")</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                    }
+
+                    @if (isEmp)
+                    {
+                        <a asp-controller="Leaves" asp-action="Create"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--success-light);color:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-calendar-plus"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">Request leave</div>
+                                <div class="fs-12 text-muted-custom">Submit a new leave request</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                        <a asp-controller="Missions" asp-action="MyMissions"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--warning-light);color:var(--warning);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-briefcase"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">My missions</div>
+                                <div class="fs-12 text-muted-custom">View assigned tasks</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                        <a asp-controller="Employees" asp-action="EditMyProfile"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:#f1f5f9;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-person-gear"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">My profile</div>
+                                <div class="fs-12 text-muted-custom">Update personal details</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                    }
+
+                    @if (isMgr)
+                    {
+                        <a asp-controller="Leaves" asp-action="Pending"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--warning-light);color:var(--warning);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-hourglass-split"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">Approve leave requests</div>
+                                <div class="fs-12 text-muted-custom">@pendingLeaves pending</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                    }
+
+                    @if (isAdmin)
+                    {
+                        <a asp-controller="Employees" asp-action="Index"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-people"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">Manage employees</div>
+                                <div class="fs-12 text-muted-custom">@totalEmployees active records</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                        <a asp-controller="Contracts" asp-action="Index"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--danger-light);color:var(--danger);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">Contracts</div>
+                                <div class="fs-12 text-muted-custom">@expiringContracts expiring soon</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                    }
+
+                    @if (isHRA)
+                    {
+                        <a asp-controller="Analytics" asp-action="DepartmentStats"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--success-light);color:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-bar-chart-line"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">Analytics</div>
+                                <div class="fs-12 text-muted-custom">Department stats &amp; reports</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                    }
+
+                    @if (isSA)
+                    {
+                        <a asp-controller="Hierarchy" asp-action="Index"
+                           class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-4 py-3">
+                            <span style="width:32px;height:32px;border-radius:8px;background:var(--success-light);color:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-diagram-3"></i>
+                            </span>
+                            <span>
+                                <div class="fw-600 fs-13">Org hierarchy</div>
+                                <div class="fs-12 text-muted-custom">View &amp; manage structure</div>
+                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted-custom"></i>
+                        </a>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Recent notifications -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header">
+                <span class="card-title">Recent notifications</span>
+                <a asp-controller="Notifications" asp-action="MyNotifications"
+                   class="btn btn-sm btn-outline-secondary" style="font-size:12px;padding:4px 10px;">
+                    View all
+                </a>
+            </div>
+            <div class="card-body p-0">
+                @{
+                    var notifs = ViewBag.RecentNotifications as IEnumerable<Milstone3_WebApp.Notification>;
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="8">No employees found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                @if (notifs != null && notifs.Any())
+                {
+                    <div class="activity-feed px-4 py-2">
+                        @foreach (var n in notifs)
+                        {
+                            <div class="activity-item">
+                                <div class="activity-dot"></div>
+                                <div>
+                                    <div class="activity-text fw-600 fs-13">@n.Title</div>
+                                    <div class="activity-time">@n.MessageContent</div>
+                                    <div class="activity-time">@n.CreatedAt?.ToString("dd MMM yyyy, HH:mm")</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column align-items-center justify-content-center py-5 text-center">
+                        <i class="bi bi-bell-slash" style="font-size:32px;color:var(--text-muted);margin-bottom:10px;"></i>
+                        <div class="fs-13 fw-600" style="color:var(--text-secondary);">No notifications yet</div>
+                        <div class="fs-12" style="color:var(--text-muted);">You're all caught up!</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
 </div>

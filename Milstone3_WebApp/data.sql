@@ -1,6 +1,25 @@
 USE HR_Payroll_System;
 GO
 
+-- Insert Roles (if they don't exist)
+-- Using MERGE to avoid duplicates if roles already exist.
+-- These role_name values must match the roles the application checks
+-- (SystemAdmin, HRAdmin, LineManager, Employee, etc.).
+MERGE Role AS target
+USING (VALUES
+    ('HRAdmin'),
+    ('LineManager'),
+    ('Employee'),
+    ('Executive'),
+    ('PayrollFinance'),
+    ('Recruiter'),
+    ('SystemAdmin')
+) AS source (role_name)
+ON target.role_name = source.role_name
+WHEN NOT MATCHED THEN
+    INSERT (role_name) VALUES (source.role_name);
+GO
+
 -- Insert Positions (if they don't exist)
 -- Using MERGE to avoid duplicates if positions already exist
 

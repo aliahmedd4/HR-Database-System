@@ -1,0 +1,373 @@
+@using System.Security.Claims
+@{
+    var role      = User.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    bool isSA     = role == "SystemAdmin";
+    bool isHRA    = role == "HRAdmin";
+    bool isLM     = role == "LineManager";
+    bool isEmp    = role == "Employee";
+    bool isAdmin  = isSA || isHRA;
+    bool isMgr    = isSA || isHRA || isLM;
+}
+
+<aside class="admin-sidebar" id="adminSidebar">
+
+    <!-- Brand -->
+    <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+        <span class="brand-icon"><i class="bi bi-people-fill"></i></span>
+        <span class="brand-name">HRMS Portal</span>
+    </a>
+
+    <!-- Nav -->
+    <nav class="sidebar-nav">
+
+        <!-- ── Main ── -->
+        <div class="nav-group">
+            <div class="nav-group-label">Main</div>
+            <div class="nav-item">
+                <a asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-grid-1x2"></i>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ── People ── -->
+        @if (isMgr)
+        {
+            <div class="nav-group">
+                <div class="nav-group-label">People</div>
+                @if (isAdmin)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Employees" asp-action="Index">
+                            <i class="bi bi-person-lines-fill"></i>
+                            <span class="nav-label">Employees</span>
+                        </a>
+                    </div>
+                }
+                @if (isLM)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Employees" asp-action="MyTeam">
+                            <i class="bi bi-people"></i>
+                            <span class="nav-label">My team</span>
+                        </a>
+                    </div>
+                }
+                @if (isAdmin)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Contracts" asp-action="Index">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span class="nav-label">Contracts</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- ── Attendance & Shifts ── -->
+        <div class="nav-group">
+            <div class="nav-group-label">Attendance &amp; shifts</div>
+            @if (isEmp)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Attendance" asp-action="Index">
+                        <i class="bi bi-clock-history"></i>
+                        <span class="nav-label">My attendance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Attendance" asp-action="Record">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span class="nav-label">Record attendance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Attendance" asp-action="MyCorrectionRequests">
+                        <i class="bi bi-pencil-square"></i>
+                        <span class="nav-label">My corrections</span>
+                    </a>
+                </div>
+            }
+            @if (isMgr)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Attendance" asp-action="Index">
+                        <i class="bi bi-calendar-check"></i>
+                        <span class="nav-label">Attendance</span>
+                    </a>
+                </div>
+                @if (isLM)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Attendance" asp-action="TeamSummary">
+                            <i class="bi bi-bar-chart-line"></i>
+                            <span class="nav-label">Team summary</span>
+                        </a>
+                    </div>
+                }
+                <div class="nav-item">
+                    <a asp-controller="Attendance" asp-action="CorrectionRequests">
+                        <i class="bi bi-clipboard-check"></i>
+                        <span class="nav-label">Correction requests</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Shifts" asp-action="Index">
+                        <i class="bi bi-calendar3"></i>
+                        <span class="nav-label">Shifts</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Shifts" asp-action="Assignments">
+                        <i class="bi bi-calendar3-range"></i>
+                        <span class="nav-label">Shift assignments</span>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- ── Leave ── -->
+        <div class="nav-group">
+            <div class="nav-group-label">Leave</div>
+            @if (isEmp)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Leaves" asp-action="Balance">
+                        <i class="bi bi-wallet2"></i>
+                        <span class="nav-label">My balance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Leaves" asp-action="Create">
+                        <i class="bi bi-plus-circle"></i>
+                        <span class="nav-label">Request leave</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Leaves" asp-action="MyLeaveHistory">
+                        <i class="bi bi-clock"></i>
+                        <span class="nav-label">Leave history</span>
+                    </a>
+                </div>
+            }
+            @if (isMgr)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Leaves" asp-action="Pending">
+                        <i class="bi bi-hourglass-split"></i>
+                        <span class="nav-label">Pending approvals</span>
+                    </a>
+                </div>
+                @if (isAdmin)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Leaves" asp-action="AllLeaveRequests">
+                            <i class="bi bi-list-ul"></i>
+                            <span class="nav-label">All requests</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a asp-controller="Leaves" asp-action="IrregularLeaves">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span class="nav-label">Irregular leaves</span>
+                        </a>
+                    </div>
+                }
+                @if (isHRA)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Leaves" asp-action="ConfigureLeavePolicies">
+                            <i class="bi bi-gear"></i>
+                            <span class="nav-label">Configure policies</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a asp-controller="Leaves" asp-action="ManageLeaveEntitlements">
+                            <i class="bi bi-sliders"></i>
+                            <span class="nav-label">Entitlements</span>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- ── Missions ── -->
+        <div class="nav-group">
+            <div class="nav-group-label">Missions</div>
+            @if (isEmp)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Missions" asp-action="MyMissions">
+                        <i class="bi bi-briefcase"></i>
+                        <span class="nav-label">My missions</span>
+                    </a>
+                </div>
+            }
+            @if (isMgr)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Missions" asp-action="Index">
+                        <i class="bi bi-briefcase-fill"></i>
+                        <span class="nav-label">All missions</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Missions" asp-action="AssignMission">
+                        <i class="bi bi-person-check"></i>
+                        <span class="nav-label">Assign mission</span>
+                    </a>
+                </div>
+                @if (isLM || isAdmin)
+                {
+                    <div class="nav-item">
+                        <a asp-controller="Missions" asp-action="PendingApprovals">
+                            <i class="bi bi-patch-check"></i>
+                            <span class="nav-label">Pending approvals</span>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- ── Notifications ── -->
+        <div class="nav-group">
+            <div class="nav-group-label">Notifications</div>
+            <div class="nav-item">
+                <a asp-controller="Notifications" asp-action="MyNotifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="nav-label">My notifications</span>
+                </a>
+            </div>
+            @if (isMgr)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Notifications" asp-action="Create">
+                        <i class="bi bi-send"></i>
+                        <span class="nav-label">Send notification</span>
+                    </a>
+                </div>
+            }
+            @if (isAdmin)
+            {
+                <div class="nav-item">
+                    <a asp-controller="Notifications" asp-action="Index">
+                        <i class="bi bi-bell-fill"></i>
+                        <span class="nav-label">All notifications</span>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- ── Analytics (HR Admin only) ── -->
+        @if (isHRA)
+        {
+            <div class="nav-group">
+                <div class="nav-group-label">Analytics</div>
+                <div class="nav-item">
+                    <a asp-controller="Analytics" asp-action="DepartmentStats">
+                        <i class="bi bi-graph-up"></i>
+                        <span class="nav-label">Department stats</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Analytics" asp-action="ComplianceReport">
+                        <i class="bi bi-shield-check"></i>
+                        <span class="nav-label">Compliance report</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Analytics" asp-action="DiversityReport">
+                        <i class="bi bi-pie-chart"></i>
+                        <span class="nav-label">Diversity report</span>
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- ── Payrolls (SA + HRA) ── -->
+        @if (isAdmin)
+        {
+            <div class="nav-group">
+                <div class="nav-group-label">Payroll</div>
+                <div class="nav-item">
+                    <a asp-controller="Payrolls" asp-action="Index">
+                        <i class="bi bi-cash-coin"></i>
+                        <span class="nav-label">Payrolls</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Payrolls" asp-action="Create">
+                        <i class="bi bi-plus-square"></i>
+                        <span class="nav-label">Generate payroll</span>
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- ── Org Hierarchy (SA only) ── -->
+        @if (isSA)
+        {
+            <div class="nav-group">
+                <div class="nav-group-label">Organisation</div>
+                <div class="nav-item">
+                    <a asp-controller="Hierarchy" asp-action="Index">
+                        <i class="bi bi-diagram-3"></i>
+                        <span class="nav-label">Org hierarchy</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Hierarchy" asp-action="DepartmentView">
+                        <i class="bi bi-building"></i>
+                        <span class="nav-label">Department view</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Hierarchy" asp-action="Reassign">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span class="nav-label">Reassign employees</span>
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- ── User Management (SA only) ── -->
+        @if (isSA)
+        {
+            <div class="nav-group">
+                <div class="nav-group-label">User management</div>
+                <div class="nav-item">
+                    <a asp-controller="Account" asp-action="CreateEmployeeAccount">
+                        <i class="bi bi-person-plus"></i>
+                        <span class="nav-label">Create account</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a asp-controller="Employees" asp-action="AssignRole">
+                        <i class="bi bi-shield-lock"></i>
+                        <span class="nav-label">Assign roles</span>
+                    </a>
+                </div>
+            </div>
+        }
+
+    </nav>
+
+    <!-- Bottom pinned -->
+    <div class="sidebar-bottom">
+        <div class="nav-item">
+            <a asp-controller="Employees" asp-action="EditMyProfile">
+                <i class="bi bi-person-gear"></i>
+                <span class="nav-label">Settings</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a asp-controller="Account" asp-action="Logout">
+                <i class="bi bi-box-arrow-left"></i>
+                <span class="nav-label">Log out</span>
+            </a>
+        </div>
+    </div>
+
+</aside>

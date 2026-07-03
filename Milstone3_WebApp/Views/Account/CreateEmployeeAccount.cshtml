@@ -181,8 +181,18 @@
                             </div>
                         </div>
 
-                        <div class="alert alert-info mt-4">
-                            <strong>ℹ️ Note:</strong> The employee will be able to log in using their email and the default password for their role. They should change their password after first login.
+                        <hr class="my-4">
+
+                        <h5 class="mb-3 text-primary">Account Password</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Initial Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" name="password" required minlength="8" placeholder="Minimum 8 characters">
+                                <div class="invalid-feedback">Please provide a password (min 8 characters).</div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-2">
+                            <strong>ℹ️ Note:</strong> Set an initial password for the employee. Share it with them securely — they should change it after their first login.
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">

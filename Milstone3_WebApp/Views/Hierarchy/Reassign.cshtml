@@ -1,74 +1,73 @@
-﻿@model Milstone3_WebApp.Employee
-
+@model Milstone3_WebApp.Employee
 @{
-    ViewData["Title"] = "Reassign Employee";
+    ViewData["Title"] = "Reassign employee";
 }
 
-<div class="welcome-banner">
-    <h2>Reassign Employee</h2>
-    <p>Update the department and manager for @Model.FullName</p>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Reassign employee</h1>
+        <p class="page-subtitle">Update the department and manager for @Model.FullName</p>
+    </div>
+    <a asp-action="Reassign" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>All employees
+    </a>
 </div>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
+<div class="row">
+    <div class="col-lg-7 col-xl-6">
+        <div class="form-card">
+            <form asp-action="Reassign" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
+                <!-- Employee summary -->
+                <div class="d-flex align-items-center gap-3 mb-4 pb-3" style="border-bottom:1px solid var(--border);">
+                    <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">
+                        @(string.Concat((Model.FullName ?? "?").Split(' ').Take(2).Select(w => char.ToUpper(w[0]))))
+                    </div>
+                    <div>
+                        <div class="fw-600 fs-13">@Model.FullName</div>
+                        <div class="fs-12 text-muted-custom">
+                            @(Model.Department?.DepartmentName ?? "No department") ·
+                            @(Model.Position?.PositionTitle ?? "No position")
+                        </div>
+                    </div>
+                </div>
 
-<div class="card">
-    <div class="card-body">
-        <form asp-action="Reassign" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="employeeId" value="@Model.EmployeeId" />
-
-            <div class="form-group mb-3">
-                <label for="newManagerId">New Manager</label>
-                <select name="newManagerId" id="newManagerId" class="form-select">
-                    <option value="">No Manager</option>
-                    @if (ViewBag.PotentialManagers != null)
-                    {
-                        @foreach (var mgr in ViewBag.PotentialManagers)
+                <div class="mb-3">
+                    <label for="newManagerId" class="form-label">New manager</label>
+                    <select name="newManagerId" id="newManagerId" class="form-select">
+                        <option value="">No manager</option>
+                        @if (ViewBag.PotentialManagers != null)
                         {
-                            <option value="@mgr.EmployeeId" selected="@(Model.ManagerId == mgr.EmployeeId)">
-                                @mgr.FullName
-                            </option>
+                            @foreach (var mgr in ViewBag.PotentialManagers)
+                            {
+                                <option value="@mgr.EmployeeId" selected="@(Model.ManagerId == mgr.EmployeeId)">@mgr.FullName</option>
+                            }
                         }
-                    }
-                </select>
-                <small class="form-text text-muted">Select a new manager for this employee, or leave as "No Manager"</small>
-            </div>
+                    </select>
+                    <div class="field-hint">Select a new manager, or leave as "No manager".</div>
+                </div>
 
-            <div class="form-group mb-3">
-                <label for="newDepartmentId">New Department <span class="text-danger">*</span></label>
-                <select name="newDepartmentId" id="newDepartmentId" class="form-select" required>
-                    <option value="">-- Select Department --</option>
-                    @if (ViewBag.Departments != null)
-                    {
-                        @foreach (var dept in ViewBag.Departments)
+                <div class="mb-4">
+                    <label for="newDepartmentId" class="form-label">New department <span class="text-danger">*</span></label>
+                    <select name="newDepartmentId" id="newDepartmentId" class="form-select" required>
+                        <option value="">Select department…</option>
+                        @if (ViewBag.Departments != null)
                         {
-                            <option value="@dept.DepartmentId" selected="@(Model.DepartmentId == dept.DepartmentId)">
-                                @dept.DepartmentName
-                            </option>
+                            @foreach (var dept in ViewBag.Departments)
+                            {
+                                <option value="@dept.DepartmentId" selected="@(Model.DepartmentId == dept.DepartmentId)">@dept.DepartmentName</option>
+                            }
                         }
-                    }
-                </select>
-                <small class="form-text text-muted">Select the new department for this employee</small>
-            </div>
+                    </select>
+                </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Confirm Reassignment</button>
-                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm">Confirm reassignment</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

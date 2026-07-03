@@ -1,157 +1,150 @@
-﻿@model IEnumerable<Milstone3_WebApp.Contract>
-
+@model IEnumerable<Milstone3_WebApp.Contract>
 @{
-    ViewData["Title"] = "Contracts Management";
-    var activeContracts = ViewData["ActiveContracts"] as List<Milstone3_WebApp.Contract> ?? new List<Milstone3_WebApp.Contract>();
-    var expiringContracts = ViewData["ExpiringContracts"] as List<Milstone3_WebApp.Contract> ?? new List<Milstone3_WebApp.Contract>();
-    var today = (DateOnly)ViewData["Today"]!;
-    var expirationThreshold = (DateOnly)ViewData["ExpirationThreshold"]!;
+    ViewData["Title"] = "Contracts";
+    var activeContracts   = ViewData["ActiveContracts"]   as List<Milstone3_WebApp.Contract> ?? new();
+    var expiringContracts = ViewData["ExpiringContracts"] as List<Milstone3_WebApp.Contract> ?? new();
+    var today = ViewData["Today"] is DateOnly d ? d : DateOnly.FromDateTime(DateTime.Today);
 }
 
-<h1>Contracts Management</h1>
-
-@if (User.IsInRole("HRAdmin"))
-{
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Create New Contract</a>
-    </p>
-}
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Contracts</h1>
+        <p class="page-subtitle">
+            @activeContracts.Count active —
+            @if (expiringContracts.Any())
+            {
+                <span style="color:var(--warning);font-weight:600;">@expiringContracts.Count expiring within 30 days</span>
+            }
+            else { <text>no contracts expiring soon</text> }
+        </p>
     </div>
-}
+    @if (User.IsInRole("HRAdmin"))
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus me-1"></i>New contract
+        </a>
+    }
+</div>
 
-<!-- Expiring Contracts Section -->
+<!-- Expiring contracts alert banner -->
 @if (expiringContracts.Any())
 {
-    <div class="alert alert-warning">
-        <h3>⚠️ Contracts Expiring Soon (within 30 days)</h3>
-        <p class="mb-0">The following contracts are expiring soon and may need renewal.</p>
-    </div>
-
-    <div class="table-responsive mb-4">
-        <table class="table table-warning table-striped">
-            <thead>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Contract Type</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Days Until Expiration</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in expiringContracts)
-                {
-                    var daysUntilExpiration = item.EndDate.HasValue 
-                        ? (item.EndDate.Value.DayNumber - today.DayNumber) 
-                        : 0;
-                    <tr>
-                        <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
-                        <td>@Html.DisplayFor(modelItem => item.ContractType)</td>
-                        <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
-                        <td>
-                            @if (item.EndDate.HasValue)
-                            {
-                                @Html.DisplayFor(modelItem => item.EndDate)
-                            }
-                            else
-                            {
-                                <span class="text-muted">Indefinite</span>
-                            }
-                        </td>
-                        <td>
-                            @if (item.EndDate.HasValue)
-                            {
-                                <span class="badge bg-danger">@daysUntilExpiration days</span>
-                            }
-                        </td>
-                        <td>
-                            <span class="badge bg-warning">@Html.DisplayFor(modelItem => item.CurrentState)</span>
-                        </td>
-                        <td>
-                            @if (User.IsInRole("HRAdmin"))
-                            {
-                                <a asp-action="Renew" asp-route-id="@item.ContractId" class="btn btn-sm btn-warning">Renew</a>
-                                <span>|</span>
-                                <a asp-action="Edit" asp-route-id="@item.ContractId" class="btn btn-sm btn-secondary">Edit</a>
-                                <span>|</span>
-                            }
-                            <a asp-action="Details" asp-route-id="@item.ContractId" class="btn btn-sm btn-info">Details</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="card mb-3" style="border-top:3px solid var(--warning);">
+        <div class="card-header">
+            <span class="card-title" style="color:var(--warning);">
+                <i class="bi bi-exclamation-triangle me-2"></i>Contracts expiring soon
+            </span>
+        </div>
+        <div class="card-body p-0">
+            <div class="admin-table-wrap">
+                <table class="admin-table" id="expiringTable">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Type</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Days left</th>
+                            <th>State</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in expiringContracts)
+                        {
+                            var daysLeft = item.EndDate.HasValue
+                                ? (item.EndDate.Value.DayNumber - today.DayNumber) : 0;
+                            <tr>
+                                <td class="fw-600">Employee #@item.EmployeeId</td>
+                                <td>@item.ContractType</td>
+                                <td>@item.StartDate</td>
+                                <td>@(item.EndDate?.ToString("dd MMM yyyy") ?? "Indefinite")</td>
+                                <td><span class="pill pill-expiring">@daysLeft days</span></td>
+                                <td><span class="pill pill-expiring">@item.CurrentState</span></td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        @if (User.IsInRole("HRAdmin"))
+                                        {
+                                            <a asp-action="Renew" asp-route-id="@item.ContractId" class="btn btn-sm btn-warning">Renew</a>
+                                            <a asp-action="Edit"  asp-route-id="@item.ContractId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        }
+                                        <a asp-action="Details" asp-route-id="@item.ContractId" class="btn btn-sm btn-outline-secondary">Details</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 }
 
-<!-- Active Contracts Section -->
-<h3>Active Contracts</h3>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Contract Type</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (activeContracts.Any())
-            {
-                @foreach (var item in activeContracts)
-                {
+<!-- Active contracts -->
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">Active contracts</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="dt-controls px-4 pt-4 pb-2">
+            <div class="dt-search">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" placeholder="Search contracts…"
+                       data-dt-search="activeTable" data-dt-pagesize="15" />
+            </div>
+            <span class="fs-12 text-muted-custom" data-dt-info="activeTable"></span>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table" id="activeTable">
+                <thead>
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => item.EmployeeId)</td>
-                        <td>@Html.DisplayFor(modelItem => item.ContractType)</td>
-                        <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
-                        <td>
-                            @if (item.EndDate.HasValue)
-                            {
-                                @Html.DisplayFor(modelItem => item.EndDate)
-                            }
-                            else
-                            {
-                                <span class="text-muted">Indefinite</span>
-                            }
-                        </td>
-                        <td>
-                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.CurrentState)</span>
-                        </td>
-                        <td>
-                            @if (item.CreatedAt.HasValue)
-                            {
-                                @item.CreatedAt.Value.ToString("yyyy-MM-dd")
-                            }
-                        </td>
-                        <td>
-                            @if (User.IsInRole("HRAdmin"))
-                            {
-                                <a asp-action="Edit" asp-route-id="@item.ContractId" class="btn btn-sm btn-secondary">Edit</a>
-                                <span>|</span>
-                            }
-                            <a asp-action="Details" asp-route-id="@item.ContractId" class="btn btn-sm btn-info">Details</a>
-                        </td>
+                        <th>Employee</th>
+                        <th data-sort>Type</th>
+                        <th data-sort>Start</th>
+                        <th data-sort>End</th>
+                        <th>State</th>
+                        <th>Created</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="7" class="text-center text-muted">No active contracts found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (activeContracts.Any())
+                    {
+                        @foreach (var item in activeContracts)
+                        {
+                            <tr>
+                                <td class="fw-600">Employee #@item.EmployeeId</td>
+                                <td>@item.ContractType</td>
+                                <td>@item.StartDate</td>
+                                <td>@(item.EndDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                                <td><span class="pill pill-active">@(item.CurrentState ?? "Active")</span></td>
+                                <td class="text-muted-custom">@(item.CreatedAt?.ToString("dd MMM yyyy") ?? "—")</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        @if (User.IsInRole("HRAdmin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.ContractId" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        }
+                                        <a asp-action="Details" asp-route-id="@item.ContractId" class="btn btn-sm btn-outline-secondary">Details</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted-custom">No active contracts found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="dt-pagination px-4 pb-3">
+            <span class="fs-12 text-muted-custom" data-dt-info="activeTable"></span>
+            <div class="dt-page-btns" data-dt-pages="activeTable"></div>
+        </div>
+    </div>
 </div>
